@@ -1,0 +1,68 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+apply plugin: 'java'
+apply plugin: "com.github.johnrengelman.shadow"
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+compileJava.options.encoding = 'UTF-8'
+
+group = 'fr.customentity'
+version = '1.0-SNAPSHOT'
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.1"
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+    }
+
+    maven {
+        url = 'https://oss.sonatype.org/content/repositories/snapshots'
+    }
+    maven { url 'https://jitpack.io' }
+    maven {
+        url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/'
+    }
+}
+
+dependencies {
+    compileOnly fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(dir: 'libs/export', include: ['*.jar'])
+    compile 'com.google.inject:guice:4.1.0'
+    compile 'com.google.inject.extensions:guice-assistedinject:4.1.0'
+    compile 'com.zaxxer:HikariCP:3.4.5'
+    compileOnly 'com.github.MilkBowl:VaultAPI:1.7'
+    compileOnly 'me.clip:placeholderapi:2.10.9'
+    compileOnly 'org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT'
+}
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        filter ReplaceTokens, tokens: [version: version]
+    }
+}
+
+shadowJar {
+    archiveName = "TheSyncTowers.jar"
+    exclude('com/google/common/**')
+}
+
+tasks.build.dependsOn(shadowJar)
+
