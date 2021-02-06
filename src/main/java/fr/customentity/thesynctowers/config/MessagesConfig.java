@@ -2,9 +2,8 @@ package fr.customentity.thesynctowers.config;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import fr.customentity.nexus.NexusPlugin;
-import fr.customentity.nexus.tl.Tl;
 import fr.customentity.thesynctowers.TheSyncTowers;
+import fr.customentity.thesynctowers.locale.Tl;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -17,8 +16,7 @@ public class MessagesConfig {
     private FileConfiguration messagesConfig;
     private File messagesFile;
 
-    @Inject private final TheSyncTowers plugin;
-
+    @Inject private TheSyncTowers plugin;
 
     public void setup() {
         if (!plugin.getDataFolder().exists()) {

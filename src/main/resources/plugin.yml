@@ -4,3 +4,5 @@ main: fr.customentity.thesynctowers.TheSyncTowers
 api-version: 1.16
 authors: [ CustomEntity ]
 description: Suitable for a faction pvp server that wants to add an event.
+commands:
+  thesynctowers:

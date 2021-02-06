@@ -9,10 +9,10 @@ import org.bukkit.Bukkit;
 public class ListenerManager {
 
     @Inject private TheSyncTowers plugin;
-    @Inject private PlayerListener playerListener;
+    @Inject private BlockListener blockListener;
 
 
     public void registerListeners() {
-        Bukkit.getPluginManager().registerEvents(playerListener, plugin);
+        Bukkit.getPluginManager().registerEvents(blockListener, plugin);
     }
 }

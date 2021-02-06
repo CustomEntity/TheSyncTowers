@@ -11,9 +11,6 @@ compileJava.options.encoding = 'UTF-8'
 group = 'fr.customentity'
 version = '1.0-SNAPSHOT'
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
-
 buildscript {
     repositories {
         mavenCentral()
@@ -22,7 +19,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.1"
+        classpath "com.github.jengelman.gradle.plugins:shadow:5.2.0"
     }
 }
 

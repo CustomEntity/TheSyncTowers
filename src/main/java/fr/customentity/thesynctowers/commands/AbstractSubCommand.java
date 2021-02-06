@@ -1,25 +1,24 @@
 package fr.customentity.thesynctowers.commands;
 
-import fr.customentity.nexus.NexusPlugin;
-import fr.customentity.nexus.api.nexus.INexus;
-import fr.customentity.nexus.api.nexus.phase.IPhase;
-import fr.customentity.nexus.api.nexus.reward.IReward;
-import fr.customentity.nexus.permissions.Perm;
-import fr.customentity.nexus.tl.Tl;
-import fr.customentity.nexus.utils.Perms;
+import com.google.inject.Inject;
+import fr.customentity.thesynctowers.TheSyncTowers;
+import fr.customentity.thesynctowers.locale.Tl;
+import fr.customentity.thesynctowers.permissible.Perm;
+import fr.customentity.thesynctowers.utils.Perms;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 public abstract class AbstractSubCommand {
 
-    protected NexusPlugin plugin;
-
+    private final TheSyncTowers plugin;
     private final String commandName;
     private final String permission;
     private final String[] aliases;
 
-    public AbstractSubCommand(String commandName, String permission, String... aliases) {
+    @Inject
+    public AbstractSubCommand(TheSyncTowers plugin, String commandName, String permission, String... aliases) {
+        this.plugin = plugin;
         this.commandName = commandName;
         this.permission = permission;
         this.aliases = aliases;
@@ -55,12 +54,8 @@ public abstract class AbstractSubCommand {
         return aliases;
     }
 
-    public NexusPlugin getPlugin() {
+    public TheSyncTowers getPlugin() {
         return plugin;
-    }
-
-    public void setPlugin(NexusPlugin plugin) {
-        this.plugin = plugin;
     }
 
     protected boolean isPlayer(CommandSender sender) {
@@ -71,19 +66,9 @@ public abstract class AbstractSubCommand {
         return (Player) sender;
     }
 
-    protected void sendMessage(CommandSender sender, Tl tl, INexus nexus, IReward reward, String... replace) {
-        Tl.sendConfigMessage(sender, tl, nexus, reward, replace);
-    }
 
     protected void sendMessage(CommandSender sender, Tl tl, String... replace) {
         Tl.sendConfigMessage(sender, tl, replace);
     }
 
-    protected void sendMessage(CommandSender sender, Tl tl, INexus nexus, String... replace) {
-        Tl.sendConfigMessage(sender, tl, nexus, replace);
-    }
-
-    protected void sendMessage(CommandSender sender, Tl tl, INexus nexus, IPhase phase, String... replace) {
-        Tl.sendConfigMessage(sender, tl, nexus, phase, replace);
-    }
 }

@@ -1,13 +1,8 @@
 package fr.customentity.thesynctowers.locale;
 
-import fr.customentity.nexus.NexusPlugin;
-import fr.customentity.nexus.api.nexus.INexus;
-import fr.customentity.nexus.api.nexus.IRunningNexus;
-import fr.customentity.nexus.api.nexus.participants.IParticipant;
-import fr.customentity.nexus.api.nexus.phase.IPhase;
-import fr.customentity.nexus.api.nexus.reward.IReward;
-import fr.customentity.nexus.utils.ActionBarUtils;
-import fr.customentity.nexus.utils.TitleUtils;
+import fr.customentity.thesynctowers.TheSyncTowers;
+import fr.customentity.thesynctowers.utils.ActionBarUtils;
+import fr.customentity.thesynctowers.utils.TitleUtils;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -269,19 +264,19 @@ public enum Tl {
     private final List<String> defaultMessage;
     private final String path;
 
-    private final NexusPlugin plugin;
+    private final TheSyncTowers plugin;
 
     Tl(String defaultMessage) {
         this.defaultMessage = Collections.singletonList(defaultMessage);
         this.path = this.name().replace("_", ".").replace("$", "-");
 
-        this.plugin = JavaPlugin.getPlugin(NexusPlugin.class);
+        this.plugin = JavaPlugin.getPlugin(TheSyncTowers.class);
     }
 
     Tl(List<String> listDefaultMessages) {
         this.defaultMessage = listDefaultMessages;
         this.path = this.name().replace("_", ".").replace("$", "-");
-        this.plugin = JavaPlugin.getPlugin(NexusPlugin.class);
+        this.plugin = JavaPlugin.getPlugin(TheSyncTowers.class);
     }
 
     public List<String> getMessage() {
@@ -297,122 +292,6 @@ public enum Tl {
         return defaultMessage.size() != 1;
     }
 
-    public static String addNexusPlaceholder(INexus nexus, String toReplace) {
-        return toReplace.replace("%nexus_name%", nexus.getName())
-                .replace("%nexus_health%", nexus.getHealth() + "")
-                .replace("%nexus_health_integer%", (int)nexus.getHealth() + "")
-                .replace("%nexus_timeup%", nexus.getTimeBeforeEnd() + "")
-                .replace("%nexus_phase_count%", nexus.getPhases().size() + "")
-                .replace("%nexus_location_X%", nexus.getLocation().getBlockX() + "")
-                .replace("%nexus_location_Y%", nexus.getLocation().getBlockY() + "")
-                .replace("%nexus_location_Z%", nexus.getLocation().getBlockZ() + "")
-                ;
-    }
-
-    public static String addRunningNexusPlaceholder(IRunningNexus nexus, String toReplace) {
-        String replaced = addNexusPlaceholder(nexus.getNexus(), toReplace);
-        return replaced.replace("%runningnexus_health%", new DecimalFormat("#.##").format(nexus.getCurrentHealth()))
-                .replace("%runningnexus_health_integer%", (int)nexus.getCurrentHealth() + "")
-                .replace("%runningnexus_timeremaining%", nexus.getTimeRemaining() + "")
-                .replace("%runningnexus_phase_id%", nexus.getCurrentPhase() == null ? "" : nexus.getCurrentPhase().getPhase().getId() + "")
-                .replace("%runningnexus_phase_healthstage%", nexus.getCurrentPhase() == null ? "" : nexus.getCurrentPhase().getPhase().getHealthStage() + "")
-                ;
-    }
-
-    public static List<String> addTopPlaceholder(IRunningNexus nexus, Player player, List<String> toReplace) {
-        return toReplace.stream().map(s -> addTopPlaceholder(nexus, player, s)).collect(Collectors.toList());
-    }
-
-    public static String addTopPlaceholder(IRunningNexus runningNexus, Player player, String toReplace) {
-        String replaced = toReplace;
-        LinkedList<IParticipant> participants = new LinkedList<>(runningNexus.getNexus().getQueue().getTopParticipants().keySet());
-
-        Optional<IParticipant> participant = runningNexus.getNexus().getQueue().getParticipantByName(player.getName());
-        if (participant.isPresent() && participants.contains(participant.get()))
-            replaced = replaced.replace("%nexus_player_top%", participants.indexOf(participant.get()) + 1 + "");
-        else
-            replaced = replaced.replace("%nexus_player_top%", Tl.SCOREBOARD_TOP$EMPTY.getConfigMessages().get(0));
-
-        for (int i = 1; i < 10; i++) {
-            if (participants.size() < i) {
-                replaced = replaced.replace("%nexus_top_" + i + "%", Tl.SCOREBOARD_TOP$EMPTY.getConfigMessages().get(0))
-                        .replace("%nexus_top_" + i + "_damage%", "")
-                        .replace("%nexus_top_" + i + "_damage_integer%", "")
-                ;
-            } else {
-                replaced = replaced.replace("%nexus_top_" + i + "%", participants.get(i - 1).getParticipantName())
-                        .replace("%nexus_top_" + i + "_damage_integer%", ""+ runningNexus.getNexus().getQueue().getParticipantsDamage().get(participants.get(i - 1)).intValue())
-                        .replace("%nexus_top_" + i + "_damage%", new DecimalFormat("#.##")
-                                .format(runningNexus.getNexus().getQueue().getParticipantsDamage().get(participants.get(i - 1))));
-            }
-        }
-        return replaced;
-    }
-
-    public static String addNexusPhasePlaceholder(IPhase phase, String toReplace) {
-        return toReplace.replace("%nexus_phase_id%", phase.getId() + "")
-                .replace("%nexus_phase_healthstage%", phase.getHealthStage() + "")
-                ;
-    }
-
-    public static String addNexusRewardPlaceholder(IReward reward, String toReplace) {
-        return toReplace.replace("%nexus_reward_interval_begin%", reward.getBegin() + "")
-                .replace("%nexus_reward_interval_end%", reward.getEnd() + "")
-                ;
-    }
-
-
-    public static List<String> addRunningNexusPlaceholder(IRunningNexus nexus, List<String> toReplace) {
-        return toReplace.stream().map(s -> addRunningNexusPlaceholder(nexus, s)).collect(Collectors.toList());
-    }
-
-    public static void sendConfigMessage(CommandSender sender, Tl tl, INexus nexus, IReward reward, String... replace) {
-        HashMap<String, String> replaced = new HashMap<>();
-        List<String> replaceList = Arrays.asList(replace);
-        int index = 0;
-        for (String str : replaceList) {
-            index++;
-            if (index % 2 == 0) continue;
-            replaced.put(str, replaceList.get(index));
-        }
-        tl.getConfigMessages().forEach(s -> sendConfigMessage(sender, addNexusPlaceholder(nexus, addNexusRewardPlaceholder(reward, s)), replaced));
-    }
-
-    public static void sendConfigMessage(CommandSender sender, Tl tl, INexus nexus, String... replace) {
-        HashMap<String, String> replaced = new HashMap<>();
-        List<String> replaceList = Arrays.asList(replace);
-        int index = 0;
-        for (String str : replaceList) {
-            index++;
-            if (index % 2 == 0) continue;
-            replaced.put(str, replaceList.get(index));
-        }
-        tl.getConfigMessages().forEach(s -> sendConfigMessage(sender, addNexusPlaceholder(nexus, s), replaced));
-    }
-
-    public static void sendConfigMessage(CommandSender sender, Tl tl, INexus nexus, IPhase phase, String... replace) {
-        HashMap<String, String> replaced = new HashMap<>();
-        List<String> replaceList = Arrays.asList(replace);
-        int index = 0;
-        for (String str : replaceList) {
-            index++;
-            if (index % 2 == 0) continue;
-            replaced.put(str, replaceList.get(index));
-        }
-        tl.getConfigMessages().forEach(s -> sendConfigMessage(sender, addNexusPlaceholder(nexus, addNexusPhasePlaceholder(phase, s)), replaced));
-    }
-
-    public static void sendConfigMessage(CommandSender sender, Tl tl, IRunningNexus nexus, String... replace) {
-        HashMap<String, String> replaced = new HashMap<>();
-        List<String> replaceList = Arrays.asList(replace);
-        int index = 0;
-        for (String str : replaceList) {
-            index++;
-            if (index % 2 == 0) continue;
-            replaced.put(str, replaceList.get(index));
-        }
-        tl.getConfigMessages().forEach(s -> sendConfigMessage(sender, addRunningNexusPlaceholder(nexus, s), replaced));
-    }
 
     public static void sendConfigMessage(CommandSender sender, Tl tl, String... replace) {
         HashMap<String, String> replaced = new HashMap<>();
@@ -471,11 +350,7 @@ public enum Tl {
     }
 
     public static void sendHelpMessage(CommandSender commandSender) {
-        // (commandSender.hasPermission("investment.admin")) {
-        //Tl.sendConfigMessage(commandSender, Tl.GENERAL_HELP$MESSAGE$ADMIN);
-        //} else {
         Tl.sendConfigMessage(commandSender, Tl.GENERAL_HELP$MESSAGE);
-        //}
     }
 
     @Override

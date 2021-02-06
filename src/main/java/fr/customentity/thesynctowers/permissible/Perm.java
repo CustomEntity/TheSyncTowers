@@ -1,4 +1,4 @@
-package fr.customentity.thesynctowers.permissions;
+package fr.customentity.thesynctowers.permissible;
 
 import org.bukkit.command.CommandSender;
 

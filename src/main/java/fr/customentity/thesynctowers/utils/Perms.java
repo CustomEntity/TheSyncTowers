@@ -1,6 +1,6 @@
 package fr.customentity.thesynctowers.utils;
 
-import fr.customentity.thesynctowers.permissions.Perm;
+import fr.customentity.thesynctowers.permissible.Perm;
 import org.bukkit.command.CommandSender;
 
 public class Perms {
