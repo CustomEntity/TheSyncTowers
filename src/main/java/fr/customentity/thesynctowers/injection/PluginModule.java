@@ -3,8 +3,10 @@ package fr.customentity.thesynctowers.injection;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import fr.customentity.thesynctowers.TheSyncTowers;
-import fr.customentity.thesynctowers.data.towers.Tower;
-import fr.customentity.thesynctowers.data.towers.TowerSync;
+import fr.customentity.thesynctowers.data.RunningTowerSync;
+import fr.customentity.thesynctowers.data.tower.Tower;
+import fr.customentity.thesynctowers.data.TowerSync;
+import fr.customentity.thesynctowers.tasks.RunningTowerSyncTask;
 
 public class PluginModule extends AbstractModule {
 
@@ -21,5 +23,7 @@ public class PluginModule extends AbstractModule {
                 .build(Tower.Factory.class));
         this.install(new FactoryModuleBuilder()
                 .build(TowerSync.Factory.class));
+        this.install(new FactoryModuleBuilder()
+                .build(RunningTowerSync.Factory.class));
     }
 }

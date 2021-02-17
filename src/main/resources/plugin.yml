@@ -6,3 +6,4 @@ authors: [ CustomEntity ]
 description: Suitable for a faction pvp server that wants to add an event.
 commands:
   thesynctowers:
+    aliases: [tst]

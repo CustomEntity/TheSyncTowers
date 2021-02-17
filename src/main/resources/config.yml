@@ -1,0 +1,23 @@
+settings:
+  start-cooldown-in-second: 300
+  start-cooldown-messages-in-second:
+    - 300
+    - 240
+    - 180
+    - 120
+    - 60
+    - 30
+    - 15
+    - 10
+    - 9
+    - 8
+    - 7
+    - 6
+    - 5
+    - 4
+    - 3
+    - 2
+    - 1
+  save-datas-delay: 3600
+  # PLAYER | FACTION | GANG | SKYBLOCKTEAM
+  participant-type: PLAYER

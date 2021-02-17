@@ -3,7 +3,9 @@ package fr.customentity.thesynctowers.commands;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import fr.customentity.thesynctowers.TheSyncTowers;
+import fr.customentity.thesynctowers.commands.all.*;
 import fr.customentity.thesynctowers.locale.Tl;
+import fr.customentity.thesynctowers.permissible.Perm;
 import fr.customentity.thesynctowers.utils.Perms;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -14,10 +16,12 @@ import java.util.*;
 @Singleton
 public class SubCommandManager implements CommandExecutor {
 
+    private final TheSyncTowers plugin;
     private final Set<AbstractSubCommand> subCommandSet;
 
     @Inject
     public SubCommandManager(TheSyncTowers plugin) {
+        this.plugin = plugin;
         this.subCommandSet = new HashSet<>();
 
         Objects.requireNonNull(plugin.getCommand("thesynctowers")).setExecutor(this);
@@ -25,14 +29,17 @@ public class SubCommandManager implements CommandExecutor {
     }
 
     public void registerCommands() {
-/*        subCommandSet.add(new CommandCreate("create", Perm.COMMAND_CREATE.getPermission()));
-        subCommandSet.add(new CommandDelete("delete", Perm.COMMAND_DELETE.getPermission()));
-        subCommandSet.add(new CommandEdit("edit", Perm.COMMAND_EDIT.getPermission()));
+        subCommandSet.add(new CommandCreate(this.plugin, "create", Perm.COMMAND_CREATE.getPermission()));
+        subCommandSet.add(new CommandDelete(this.plugin, "delete", Perm.COMMAND_DELETE.getPermission()));
+        subCommandSet.add(new CommandReload(this.plugin, "reload", Perm.COMMAND_RELOAD.getPermission()));
+        subCommandSet.add(new CommandStart(this.plugin, "start", Perm.COMMAND_START.getPermission()));
+        subCommandSet.add(new CommandNow(this.plugin, "now", Perm.COMMAND_NOW.getPermission()));
+        subCommandSet.add(new CommandEdit(this.plugin, "edit", Perm.COMMAND_EDIT.getPermission()));
+        /*subCommandSet.add(new CommandEdit("edit", Perm.COMMAND_EDIT.getPermission()));
         subCommandSet.add(new CommandList("list", Perm.COMMAND_LIST.getPermission()));
-        subCommandSet.add(new CommandStart("start", Perm.COMMAND_START.getPermission()));
+
         subCommandSet.add(new CommandScheduler("scheduler", Perm.COMMAND_SCHEDULER.getPermission()));
-        subCommandSet.add(new CommandReload("reload", Perm.COMMAND_RELOAD.getPermission()));
-        subCommandSet.add(new CommandNow("now", Perm.COMMAND_NOW.getPermission()));
+
         subCommandSet.add(new CommandStop("stop", Perm.COMMAND_STOP.getPermission()));
         subCommandSet.add(new CommandReward("reward", Perm.COMMAND_REWARD.getPermission()));
         subCommandSet.add(new CommandVersion("version", null));*/

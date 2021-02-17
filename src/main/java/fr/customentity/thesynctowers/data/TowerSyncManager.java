@@ -1,4 +1,4 @@
-package fr.customentity.thesynctowers.data.towers;
+package fr.customentity.thesynctowers.data;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -11,10 +11,10 @@ import java.util.stream.Collectors;
 @Singleton
 public class TowerSyncManager {
 
-    private TheSyncTowers plugin;
+    private final TheSyncTowers plugin;
     private Set<TowerSync> towerSyncs;
 
-    private TowerSync.Factory towerSyncFactory;
+    private final TowerSync.Factory towerSyncFactory;
 
     @Inject
     public TowerSyncManager(TheSyncTowers plugin, TowerSync.Factory towerSyncFactory) {
@@ -53,5 +53,9 @@ public class TowerSyncManager {
 
     public Set<TowerSync> getTowerSyncs() {
         return towerSyncs;
+    }
+
+    public void setTowerSyncs(Set<TowerSync> towerSyncs) {
+        this.towerSyncs = towerSyncs;
     }
 }
