@@ -14,7 +14,29 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ *  Copyright (c) 2021. By CustomEntity
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * @Author: CustomEntity
+ * @Date: 18/02/2021
+ *
+ */
 public class CommandEdit extends AbstractSubCommand {
+
+    /*
+    TODO: ADD EDIT TYPE AND VALUE TO WIN
+
+    * */
 
     public CommandEdit(TheSyncTowers plugin, String commandName, String permission, String... aliases) {
         super(plugin, commandName, permission, aliases);
@@ -28,7 +50,7 @@ public class CommandEdit extends AbstractSubCommand {
         } else {
             Optional<TowerSync> towerSyncOptional = this.getPlugin().getTowerSyncManager().getTowerSyncByName(args[0]);
             if (!towerSyncOptional.isPresent()) {
-                this.sendMessage(sender, Tl.GENERAL_SYNCTOWER$NOT$EXISTS);
+                this.sendMessage(sender, Tl.GENERAL_TOWERSYNC$NOT$EXISTS);
                 return;
             }
             TowerSync towerSync = towerSyncOptional.get();
@@ -62,6 +84,8 @@ public class CommandEdit extends AbstractSubCommand {
                         return;
                     }
 
+                    block.getWorld().getBlockAt(block.getLocation()).setType(Material.AIR);
+
                     towerSync.addTower(block.getLocation(), block.getType());
                     this.sendMessage(sender, Tl.COMMAND_EDIT_TOWER_ADD_SUCCESS, towerSync);
                 } else if (args[2].equalsIgnoreCase("remove")) {
@@ -82,7 +106,7 @@ public class CommandEdit extends AbstractSubCommand {
                         return;
                     }
 
-                    towerSync.getTowers().remove(id);
+                    towerSync.removeTower(id);
                     this.sendMessage(sender, Tl.COMMAND_EDIT_TOWER_REMOVE_SUCCESS, towerSync, "%arg%", id + "");
                 } else if (args[2].equalsIgnoreCase("list")) {
                     List<Tower> towerList = towerSync.getTowers();

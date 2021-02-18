@@ -12,6 +12,23 @@ import fr.customentity.thesynctowers.listeners.ListenerManager;
 import fr.customentity.thesynctowers.settings.Settings;
 import org.bukkit.plugin.java.JavaPlugin;
 
+/**
+ *  Copyright (c) 2021. By CustomEntity
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * @Author: CustomEntity
+ * @Date: 18/02/2021
+ *
+ */
 public final class TheSyncTowers extends JavaPlugin {
 
     @Inject
@@ -47,7 +64,7 @@ public final class TheSyncTowers extends JavaPlugin {
         this.settings.loadSettings();
 
         System.out.println(
-                        "\n  _______ _           _____               _______                         \n" +
+                "\n  _______ _           _____               _______                         \n" +
                         " |__   __| |         / ____|             |__   __|                        \n" +
                         "    | |  | |__   ___| (___  _   _ _ __   ___| | _____      _____ _ __ ___ \n" +
                         "    | |  | '_ \\ / _ \\\\___ \\| | | | '_ \\ / __| |/ _ \\ \\ /\\ / / _ \\ '__/ __|\n" +

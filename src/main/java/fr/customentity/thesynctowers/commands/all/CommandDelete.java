@@ -5,6 +5,23 @@ import fr.customentity.thesynctowers.commands.AbstractSubCommand;
 import fr.customentity.thesynctowers.locale.Tl;
 import org.bukkit.command.CommandSender;
 
+/**
+ *  Copyright (c) 2021. By CustomEntity
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * @Author: CustomEntity
+ * @Date: 18/02/2021
+ *
+ */
 public class CommandDelete extends AbstractSubCommand {
 
     public CommandDelete(TheSyncTowers plugin, String commandName, String permission, String... aliases) {
@@ -13,13 +30,13 @@ public class CommandDelete extends AbstractSubCommand {
 
     @Override
     protected void execute(CommandSender sender, String command, String[] args) {
-        if(args.length == 0) {
+        if (args.length == 0) {
             this.sendMessage(sender, Tl.COMMAND_CREATE_SYNTAX);
         } else {
 
             String name = args[0];
-            if(!this.getPlugin().getTowerSyncManager().isTowerSyncExists(name)) {
-                this.sendMessage(sender, Tl.GENERAL_SYNCTOWER$NOT$EXISTS, "%arg%", name);
+            if (!this.getPlugin().getTowerSyncManager().isTowerSyncExists(name)) {
+                this.sendMessage(sender, Tl.GENERAL_TOWERSYNC$NOT$EXISTS, "%arg%", name);
                 return;
             }
             this.getPlugin().getTowerSyncManager().deleteTowerSync(name);

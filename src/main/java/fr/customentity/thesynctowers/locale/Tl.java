@@ -12,9 +12,25 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.text.DecimalFormat;
 import java.util.*;
 
+/**
+ *  Copyright (c) 2021. By CustomEntity
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * @Author: CustomEntity
+ * @Date: 18/02/2021
+ *
+ */
 public enum Tl {
 
     GENERAL_PREFIX("&3&lTST &7&l» &f"),
@@ -25,9 +41,9 @@ public enum Tl {
     COMMAND_DELETE_SYNTAX("%prefix% &cError syntax, please use: /tst delete <name>"),
     COMMAND_DELETE_SUCCESS("%prefix% &fThe &b%arg% &ftowersync has been successfully deleted !"),
 
-    GENERAL_SYNCTOWER$ALREADY$EXISTS("%prefix% &cThat towersync already exists !"),
-    GENERAL_SYNCTOWER$NOT$EXISTS("%prefix% &cThat towersync doesn't exist !"),
-    GENERAL_SYNCTOWER$NOT$RUNNING("%prefix% &cThat towersync is not running !"),
+    GENERAL_TOWERSYNC$ALREADY$EXISTS("%prefix% &cThat towersync already exists !"),
+    GENERAL_TOWERSYNC$NOT$EXISTS("%prefix% &cThat towersync doesn't exist !"),
+    GENERAL_TOWERSYNC$NOT$RUNNING("%prefix% &cThat towersync is not running !"),
 
     COMMAND_RELOAD_SUCCESS("%prefix% &aConfig reloaded!"),
 
@@ -37,6 +53,13 @@ public enum Tl {
             " &7&l» &f/&btst create &3<name> &8- &bCreate a new towersync&f.",
             " &7&l» &f/&btst delete &3<towersync> &8- &bDelete a towersync&f.",
             " &7&l» &f/&btst reload &8- &bReload the plugin&f.",
+            " &7&l» &f/&btst stop &3<towersync> &8- &bStop a running towersync&f.",
+            " &7&l» &f/&btst now &3<towersync> &8- &bStart towersync without cooldown&f.",
+            " &7&l» &f/&btst start &3<towersync> &8- &bStart a towersync&f.",
+            " &7&l» &f/&btst list &8- &bShow towersyncs list&f.",
+            " &7&l» &f/&btst edit &3<towersync> &8- &bShow towersyncs edit commands&f.",
+            " &7&l» &f/&btst scheduler &8- &bShow towersyncs scheduler commands&f.",
+            " &7&l» &f/&btst reward &8- &bEdit towersyncs rewards &f.",
             " ",
             "&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lBy CustomEntity &3&m--&b&m--&3&m--&b&m--&3&m--&b&m--"
     )),
@@ -105,17 +128,17 @@ public enum Tl {
     COMMAND_EDIT_TOWER_LIST_FOOTER(" "),
     COMMAND_EDIT_TOWER_LIST_EMPTY("%prefix% &cThere is no tower created!"),
 
+    COMMAND_STOP_SYNTAX("%prefix% &cError syntax, please use: /tst stop <towersync>"),
+    COMMAND_STOP_SUCCESS("%prefix% &fThe &b%towersync_name% &ftowersync has been successfully stopped !"),
+
+
+    GAME_ON$TOWER$ALREADY$BROKEN("%prefix% &cYour team has already destroyed this tower !"),
+    GAME_SYNCHRONIZATION_SUCCESS("%actionbar%&aSuccessful synchronization! Your team has won &e%point% &apoints!"),
+    GAME_SYNCHRONIZATION_PROGRESSION("%actionbar%&eSynchronization in progress... &f(&e%current%&7/&e%goal%&f) &b%time%s remaining"),
+    GAME_SYNCHRONIZATION_FAILED("%actionbar%&cSynchronization failed !"),
 
 
 
-
-
-
-
-
-
-    COMMAND_STOP_SYNTAX("%prefix% &cError syntax, please use: /nexus stop <nexus>"),
-    COMMAND_STOP_SUCCESS("%prefix% &fThe &b%nexus_name% &fnexus has been successfully stopped !"),
 
 
     GENERAL_PHASE$NOT$EXISTS("%prefix% &cThat phase doesn't exist !"),
@@ -139,11 +162,6 @@ public enum Tl {
 
     COMMAND_NOT$NUMBER("%prefix% &c%arg% is not a number !"),
     COMMAND_NO$PERMISSION("%prefix% &cYou don't have permission to execute that command !"),
-
-
-
-
-
 
 
     COMMAND_SCHEDULER_HELP$MESSAGE(Arrays.asList(
@@ -188,75 +206,6 @@ public enum Tl {
 
     COMMAND_SCHEDULER_SPECIFIC_SYNTAX("%prefix% &cError syntax, please use: /nexus scheduler specific <month> <day_of_month> <time_of_day> <minute> <nexus> [...]"),
     COMMAND_SCHEDULER_SPECIFIC_SUCCESS("%prefix% The specific launch has been successfully scheduled!"),
-
-
-
-    COMMAND_PHASE_HELP$MESSAGE(Arrays.asList(
-            "&3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lNEXUS PHASE &3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--",
-            " ",
-            " &7&l» &f/&bnexus phase &3<nexus> &blist&f.",
-            " &7&l» &f/&bnexus phase &3<nexus> &badd &3<healthstage>&f.",
-            " &7&l» &f/&bnexus phase &3<nexus> &bdelete &3<phase>&f.",
-            " &7&l» &f/&bnexus phase &3<nexus> &bsethealthstage &3<phase> <healstage>&f.",
-            " &7&l» &f/&bnexus phase &3<nexus> &baction &3<add | remove | list>&f.",
-            " ",
-            "&3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lNEXUS PHASE &3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--"
-    )),
-
-    COMMAND_PHASE_LIST_HEADER(Arrays.asList(
-            "&3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lNEXUS PHASE &3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--",
-            "&b%nexus_name% &3nexus phase information",
-            " "
-    )),
-    COMMAND_PHASE_LIST_PHASE(Arrays.asList(
-            "%nexus_phase_id%.",
-            "    &eHealh Stage: %nexus_phase_healthstage% &4&l❤"
-    )),
-
-    COMMAND_PHASE_LIST_FOOTER(
-            " "
-    ),
-
-    COMMAND_PHASE_ADD_SUCCESS("%prefix% &fYou have successfully added a new phase to the nexus !"),
-    COMMAND_PHASE_ADD_SYNTAX("%prefix% &cError syntax, please use: /nexus phase <nexus> action add <phase>"),
-
-    COMMAND_PHASE_DELETE_SUCCESS("%prefix% &fYou have successfully deleted phase %phase% of nexus %nexus_name%."),
-    COMMAND_PHASE_DELETE_SYNTAX("%prefix% &cError syntax, please use: /nexus phase <nexus> delete <phase>"),
-
-    COMMAND_PHASE_SET$HEALTH$STAGE_SUCCESS("%prefix% &fYou have successfully set the phase %phase% health stage of the %nexus_name% nexus to %healthstage%."),
-    COMMAND_PHASE_SET$HEALTH$STAGE_SYNTAX("%prefix% &cError syntax, please use: /nexus phase <nexus> sethealthstage <phase> <healstage>"),
-
-    COMMAND_PHASE_ACTION_HELP(Arrays.asList(
-            "&3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lNEXUS PHASE &3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--",
-            " ",
-            " &7&l» &f/&bnexus phase &3<nexus> &baction add &3<phase>",
-            " &7&l» &f/&bnexus phase &3<nexus> &baction delete &3<phase> <id>",
-            " &7&l» &f/&bnexus phase &3<nexus> &baction list &3<phase>",
-            " ",
-            "&3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lNEXUS PHASE &3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--"
-    )),
-
-    COMMAND_PHASE_ACTION_ADD_SYNTAX("%prefix% &cError syntax, please use: /nexus phase <nexus> action add <phase>"),
-    COMMAND_PHASE_ACTION_ADD_ENTER$CREATING$MODE("%prefix% The next message you enter the chat will define the action."),
-    COMMAND_PHASE_ACTION_ADD_LEAVE$CREATING$MODE("%prefix% You just leave the action creating mode."),
-    COMMAND_PHASE_ACTION_ADD_SUCCESS("%prefix% &aYou have successfully added a new action to the nexus !"),
-
-
-    COMMAND_PHASE_ACTION_DELETE_SYNTAX("%prefix% &cError syntax, please use: /nexus phase <nexus> action delete <phase> <id>"),
-    COMMAND_PHASE_ACTION_DELETE_SUCCESS("%prefix% &fYou have successfully deleted the action of the phase &b%nexus_phase_id% &fof nexus &b%nexus_name%&f."),
-
-    COMMAND_PHASE_ACTION_LIST_SYNTAX("%prefix% &cError syntax, please use: /nexus phase <nexus> action list <phase>"),
-    COMMAND_PHASE_ACTION_LIST_HEADER(Arrays.asList(
-            "&3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lNEXUS PHASE &3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--",
-            "&bActions of phase &3%nexus_phase_id% &bof the nexus &3%nexus_name%&b:",
-            " "
-    )),
-
-    COMMAND_PHASE_ACTION_LIST_ACTION("&b%nexus_action_id%. &f%nexus_action%"),
-
-    COMMAND_PHASE_ACTION_LIST_FOOTER(Arrays.asList(
-            " ",
-            "&3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lNEXUS PHASE &3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--")),
 
 
     COMMAND_REWARD_HELP$MESSAGE(Arrays.asList(
@@ -325,8 +274,11 @@ public enum Tl {
         return defaultMessage.size() != 1;
     }
 
+    public static void sendConfigMessageToPlayer(Player player, Tl tl, String... replace) {
+        sendConfigMessage(Collections.singletonList(player), tl, replace);
+    }
 
-    public static void sendConfigMessage(CommandSender sender, Tl tl, String... replace) {
+    public static void sendConfigMessageToPlayers(List<Player> players, Tl tl, String... replace) {
         HashMap<String, String> replaced = new HashMap<>();
         List<String> replaceList = Arrays.asList(replace);
         int index = 0;
@@ -335,8 +287,25 @@ public enum Tl {
             if (index % 2 == 0) continue;
             replaced.put(str, replaceList.get(index));
         }
-        tl.getConfigMessages().forEach(s -> sendConfigMessage(sender, s, replaced));
+        players.forEach(player -> tl.getConfigMessages().forEach(s -> sendConfigMessage(player, s, replaced)));
     }
+
+    public static void sendConfigMessage(CommandSender sender, Tl tl, String... replace) {
+        sendConfigMessage(Collections.singletonList(sender), tl, replace);
+    }
+
+    public static void sendConfigMessage(List<CommandSender> commandSenders, Tl tl, String... replace) {
+        HashMap<String, String> replaced = new HashMap<>();
+        List<String> replaceList = Arrays.asList(replace);
+        int index = 0;
+        for (String str : replaceList) {
+            index++;
+            if (index % 2 == 0) continue;
+            replaced.put(str, replaceList.get(index));
+        }
+        commandSenders.forEach(commandSender -> tl.getConfigMessages().forEach(s -> sendConfigMessage(commandSender, s, replaced)));
+    }
+
     public static void sendConfigMessage(CommandSender sender, Tl tl, RunningTowerSync runningTowerSync, String... replace) {
         //TODO: REPLACE
         sendConfigMessage(sender, tl, "");
