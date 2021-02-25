@@ -7,6 +7,7 @@ import fr.customentity.thesynctowers.settings.values.*;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -30,11 +31,15 @@ import java.util.Set;
 @Singleton
 public class Settings {
 
-    public static final LongSetting SAVE_DATAS_DELAY = new LongSetting("settings.save-datas-delay", 3600);
-    public static final IntSetting START_COOLDOWN_IN_SECOND = new IntSetting("settings.start-cooldown-in-second", 300);
-    public static final IntListSetting START_COOLDOWN_MESSAGES_IN_SECOND = new IntListSetting("settings.start-cooldown-messages-in-second",
+    public static final Setting<Long> SAVE_DATAS_DELAY = new LongSetting("settings.save-datas-delay", 3600);
+    public static final Setting<Integer> START_COOLDOWN_IN_SECOND = new IntSetting("settings.start-cooldown-in-second", 300);
+    public static final Setting<List<Integer>> START_COOLDOWN_MESSAGES_IN_SECOND = new IntListSetting("settings.start-cooldown-messages-in-second",
             Arrays.asList(300, 240, 180, 120, 60, 30, 15, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1));
-    public static final StringSetting PARTICIPANT_TYPE = new StringSetting("settings.participant-type", "PLAYER");
+    public static final Setting<String> PARTICIPANT_TYPE = new StringSetting("settings.participant-type", "PLAYER");
+
+    public static final Setting<Boolean> SCOREBOARD_ENABLED = new BooleanSetting("scoreboard.enabled", true);
+    public static final Setting<Boolean> SCOREBOARD_CHECK_DISTANCE_TO_APPLY = new BooleanSetting("scoreboard.check-distance-to-apply", true);
+    public static final Setting<Integer> SCOREBOARD_DISTANCE_TO_APPLY_VALUE = new IntSetting("scoreboard.distance-to-apply-value", 20);
 
 
     private final Set<Setting<?>> settingList = new HashSet<>();
@@ -44,7 +49,7 @@ public class Settings {
     public Settings(TheSyncTowers plugin) {
         this.plugin = plugin;
 
-        registerSettings();
+        this.registerSettings();
     }
 
     public void registerSettings() {
@@ -52,7 +57,10 @@ public class Settings {
                 SAVE_DATAS_DELAY,
                 START_COOLDOWN_MESSAGES_IN_SECOND,
                 START_COOLDOWN_IN_SECOND,
-                PARTICIPANT_TYPE
+                PARTICIPANT_TYPE,
+                SCOREBOARD_ENABLED,
+                SCOREBOARD_CHECK_DISTANCE_TO_APPLY,
+                SCOREBOARD_DISTANCE_TO_APPLY_VALUE
         );
     }
 
@@ -67,6 +75,4 @@ public class Settings {
     public void registerSetting(Setting<?>... setting) {
         this.settingList.addAll(Arrays.asList(setting));
     }
-
-
 }

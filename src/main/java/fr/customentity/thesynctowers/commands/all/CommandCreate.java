@@ -1,9 +1,13 @@
 package fr.customentity.thesynctowers.commands.all;
 
+import com.google.inject.Inject;
 import fr.customentity.thesynctowers.TheSyncTowers;
 import fr.customentity.thesynctowers.commands.AbstractSubCommand;
+import fr.customentity.thesynctowers.commands.SubCommand;
 import fr.customentity.thesynctowers.data.TowerSync;
+import fr.customentity.thesynctowers.data.TowerSyncManager;
 import fr.customentity.thesynctowers.locale.Tl;
+import fr.customentity.thesynctowers.permissible.Perm;
 import org.bukkit.command.CommandSender;
 
 /**
@@ -25,22 +29,21 @@ import org.bukkit.command.CommandSender;
  */
 public class CommandCreate extends AbstractSubCommand {
 
-    public CommandCreate(TheSyncTowers plugin, String commandName, String permission, String... aliases) {
-        super(plugin, commandName, permission, aliases);
-    }
+    @Inject private TowerSyncManager towerSyncManager;
 
-    @Override
-    protected void execute(CommandSender sender, String label, String[] args) {
+    @SubCommand(subCommand = "create", permission = Perm.COMMAND_CREATE)
+    public void execute(CommandSender sender, String[] args) {
         if (!this.isPlayer(sender)) return;
         if (args.length == 0) {
             Tl.sendConfigMessage(sender, Tl.COMMAND_CREATE_SYNTAX);
         } else {
             String name = args[0];
-            if (this.getPlugin().getTowerSyncManager().isTowerSyncExists(name)) {
+            if (this.towerSyncManager.isTowerSyncExists(name)) {
                 Tl.sendConfigMessage(sender, Tl.GENERAL_TOWERSYNC$ALREADY$EXISTS, "%arg%", name);
                 return;
             }
-            this.getPlugin().getTowerSyncManager().createTowerSync(TowerSync.Type.TIME, name, 0, 300, 5000);
+            this.towerSyncManager.createTowerSync(TowerSync.Type.TIME, name, 0,
+                    300, 5000);
             Tl.sendConfigMessage(sender, Tl.COMMAND_CREATE_SUCCESS, "%arg%", name);
         }
     }

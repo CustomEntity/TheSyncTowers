@@ -3,6 +3,7 @@ package fr.customentity.thesynctowers.data.tower;
 import com.google.common.collect.Table;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
+import fr.customentity.thesynctowers.data.EndReason;
 import fr.customentity.thesynctowers.data.RunningTowerSync;
 import fr.customentity.thesynctowers.data.TowerSync;
 import fr.customentity.thesynctowers.data.participant.IParticipant;
@@ -33,9 +34,11 @@ import java.util.Optional;
  */
 public class Tower {
 
-    private TowerSync towerSync;
+
     private Location location;
     private Material material;
+
+    private transient TowerSync towerSync;
 
     @Inject
     public Tower(@Assisted TowerSync towerSync, @Assisted Location location, @Assisted Material material) {
@@ -43,6 +46,7 @@ public class Tower {
         this.location = location;
         this.material = material;
     }
+
     public interface Factory {
         Tower create(TowerSync towerSync, Location location, Material material);
     }
@@ -51,23 +55,36 @@ public class Tower {
         Optional<RunningTowerSync> runningTowerSyncOptional = towerSync.getRunningTowerSync();
         if (!runningTowerSyncOptional.isPresent()) return;
         RunningTowerSync runningTowerSync = runningTowerSyncOptional.get();
+
         IParticipant participant = IParticipant.getParticipantFromPlayer(breaker);
-        if(participant == null) {
-            // TODO: HANDLE PARTICIPANT NULL
+        if (participant == null) {
+            Tl.sendConfigMessage(breaker, Tl.GAME_NOT$IN$A$TEAM, this);
             return;
+        }
+        Optional<IParticipant> participantOptional = runningTowerSync
+                .getParticipantByName(participant.getParticipantName());
+        if (participantOptional.isPresent()) {
+            participant = participantOptional.get();
+        } else {
+            runningTowerSync.getParticipants().add(participant);
         }
 
-        if (runningTowerSync.getParticipantsTowerTable().contains(participant, this)) {
-            Tl.sendConfigMessage(breaker, Tl.GAME_ON$TOWER$ALREADY$BROKEN, towerSync);
-            return;
-        }
 
         Table<IParticipant, Tower, Long> participantTowerTable = runningTowerSync.getParticipantsTowerTable();
         Map<IParticipant, Map<Tower, Long>> rowMap = participantTowerTable.rowMap();
 
+        if (participantTowerTable.contains(participant, this)) {
+            Tl.sendConfigMessage(breaker, Tl.GAME_ON$TOWER$ALREADY$BROKEN, towerSync);
+            return;
+        }
+
         long lastBreakTime = System.currentTimeMillis();
         participantTowerTable.put(participant, this, lastBreakTime);
-        long firstBreakTime = rowMap.get(participant).entrySet().iterator().next().getValue();
+        long firstBreakTime = rowMap.get(participant).values().stream()
+                .sorted()
+                .findFirst()
+                .get();
+
         if (rowMap.get(participant).size() == runningTowerSync.getTowerSync().getTowers().size()) {
             long point = towerSync.getTimeInterval() - (lastBreakTime - firstBreakTime);
             if (point < 0) return;
@@ -79,16 +96,18 @@ public class Tower {
             runningTowerSync.getSynchronizationTaskMap().get(participant).cancel();
             runningTowerSync.getSynchronizationTaskMap().remove(participant);
             participantTowerTable.row(participant).clear();
-        } else if(rowMap.get(participant).size() == 1){
-            if(runningTowerSync.getSynchronizationTaskMap().containsKey(participant))return;
 
+            if(towerSync.getType() == TowerSync.Type.POINT && point + currentPoint == towerSync.getValueToWin())
+                runningTowerSync.stop(EndReason.WON);
+
+        } else if (rowMap.get(participant).size() == 1) {
+            if (runningTowerSync.getSynchronizationTaskMap().containsKey(participant)) return;
             SynchronizationTask synchronizationTask = new SynchronizationTask(participant, runningTowerSync, firstBreakTime);
             synchronizationTask.runTaskTimer(towerSync.getPlugin(), 0, 1);
 
             runningTowerSync.getSynchronizationTaskMap().put(participant, synchronizationTask);
         }
     }
-
 
 
     public Location getLocation() {

@@ -5,40 +5,37 @@ import com.google.inject.Inject;
 import fr.customentity.thesynctowers.commands.SubCommandManager;
 import fr.customentity.thesynctowers.config.MessagesConfig;
 import fr.customentity.thesynctowers.config.TowerSyncConfig;
-import fr.customentity.thesynctowers.data.TowerSyncManager;
-import fr.customentity.thesynctowers.gson.GsonManager;
+import fr.customentity.thesynctowers.hook.HookManager;
 import fr.customentity.thesynctowers.injection.PluginModule;
 import fr.customentity.thesynctowers.listeners.ListenerManager;
+import fr.customentity.thesynctowers.locale.Tl;
 import fr.customentity.thesynctowers.settings.Settings;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
- *  Copyright (c) 2021. By CustomEntity
- *
+ * Copyright (c) 2021. By CustomEntity
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
- *  The above copyright notice and this permission notice shall be included in
+ * <p>
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
  *
  * @Author: CustomEntity
  * @Date: 18/02/2021
- *
  */
 public final class TheSyncTowers extends JavaPlugin {
 
-    @Inject
-    private GsonManager gsonManager;
     @Inject
     private ListenerManager listenerManager;
     @Inject
     private SubCommandManager subCommandManager;
     @Inject
-    private TowerSyncManager towerSyncManager;
+    private HookManager hookManager;
     @Inject
     private MessagesConfig messagesConfig;
     @Inject
@@ -55,13 +52,18 @@ public final class TheSyncTowers extends JavaPlugin {
 
         this.listenerManager.registerListeners();
 
-        this.subCommandManager.registerCommands();
+        this.subCommandManager.registerCommands(this.getClass().getPackage().getName());
 
         this.messagesConfig.setup();
+        Tl.init(this.messagesConfig.get());
+
         this.towerSyncConfig.setup();
         this.towerSyncConfig.loadTowerSyncs();
 
         this.settings.loadSettings();
+
+        this.hookManager.onEnable();
+
 
         System.out.println(
                 "\n  _______ _           _____               _______                         \n" +
@@ -79,31 +81,9 @@ public final class TheSyncTowers extends JavaPlugin {
     @Override
     public void onDisable() {
         this.towerSyncConfig.saveTowerSyncs();
+        this.hookManager.onDisable();
     }
 
-    public GsonManager getGsonManager() {
-        return gsonManager;
-    }
-
-    public MessagesConfig getMessagesConfig() {
-        return messagesConfig;
-    }
-
-    public ListenerManager getListenerManager() {
-        return listenerManager;
-    }
-
-    public SubCommandManager getSubCommandManager() {
-        return subCommandManager;
-    }
-
-    public TowerSyncManager getTowerSyncManager() {
-        return towerSyncManager;
-    }
-
-    public Settings getSettings() {
-        return settings;
-    }
 
 /*    public void reloadPlugin() {
         this.nexusConfig.loadNexuses();

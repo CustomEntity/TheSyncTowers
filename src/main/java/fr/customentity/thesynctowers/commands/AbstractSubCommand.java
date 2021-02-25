@@ -30,20 +30,7 @@ import org.bukkit.entity.Player;
  */
 public abstract class AbstractSubCommand {
 
-    private final TheSyncTowers plugin;
-    private final String commandName;
-    private final String permission;
-    private final String[] aliases;
-
-    @Inject
-    public AbstractSubCommand(TheSyncTowers plugin, String commandName, String permission, String... aliases) {
-        this.plugin = plugin;
-        this.commandName = commandName;
-        this.permission = permission;
-        this.aliases = aliases;
-    }
-
-    protected abstract void execute(CommandSender sender, String command, String[] args);
+    public abstract void execute(CommandSender sender, String[] args);
 
     protected boolean hasPermission(CommandSender sender, String permission) {
         if (sender instanceof ConsoleCommandSender || sender.isOp())
@@ -59,22 +46,6 @@ public abstract class AbstractSubCommand {
 
     protected boolean hasPermission(CommandSender sender, Perm permission) {
         return hasPermission(sender, permission.getPermission());
-    }
-
-    public String getCommandName() {
-        return commandName;
-    }
-
-    public String getPermission() {
-        return permission;
-    }
-
-    public String[] getAliases() {
-        return aliases;
-    }
-
-    public TheSyncTowers getPlugin() {
-        return plugin;
     }
 
     protected boolean isPlayer(CommandSender sender) {

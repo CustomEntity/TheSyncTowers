@@ -17,21 +17,20 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
- *  Copyright (c) 2021. By CustomEntity
- *
+ * Copyright (c) 2021. By CustomEntity
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
- *  The above copyright notice and this permission notice shall be included in
+ * <p>
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
  *
  * @Author: CustomEntity
  * @Date: 18/02/2021
- *
  */
 
 /**
@@ -140,8 +139,8 @@ public enum XEnchantment {
      * return a Material enum name.
      * since 1.0.0
      */
-    
-    private static String format( String name) {
+
+    private static String format(String name) {
         return FORMAT_PATTERN.matcher(
                 name.trim().replace('-', '_').replace(' ', '_')).replaceAll("").toUpperCase(Locale.ENGLISH);
     }
@@ -154,8 +153,8 @@ public enum XEnchantment {
      * return an enchantment.
      * since 1.0.0
      */
-    
-    public static Optional<XEnchantment> matchXEnchantment( String enchantment) {
+
+    public static Optional<XEnchantment> matchXEnchantment(String enchantment) {
         Validate.notEmpty(enchantment, "Enchantment name cannot be null or empty");
         enchantment = format(enchantment);
 
@@ -173,8 +172,8 @@ public enum XEnchantment {
      * throws IllegalArgumentException may be thrown as an unexpeceted exception.
      * since 1.0.0
      */
-    
-    public static XEnchantment matchXEnchantment( Enchantment enchantment) {
+
+    public static XEnchantment matchXEnchantment(Enchantment enchantment) {
         Objects.requireNonNull(enchantment, "Cannot parse XEnchantment of a null enchantment");
         try {
             return valueOf(enchantment.getName());
@@ -203,7 +202,7 @@ public enum XEnchantment {
      * see #matchXEnchantment(String)
      * since 1.0.0
      */
-    
+
     public static ItemStack addEnchantFromString(ItemStack item, String enchantment) {
         Objects.requireNonNull(item, "Cannot add enchantment to null ItemStack");
         if (Strings.isNullOrEmpty(enchantment) || enchantment.equalsIgnoreCase("none")) return item;
@@ -234,7 +233,7 @@ public enum XEnchantment {
      * return an enchanted book.
      * since 1.0.0
      */
-    
+
     public ItemStack getBook(int level) {
         ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
         EnchantmentStorageMeta meta = (EnchantmentStorageMeta) book.getItemMeta();
@@ -264,7 +263,7 @@ public enum XEnchantment {
      * see Enchantment#getByKey(NamespacedKey)
      * since 1.0.0
      */
-    
+
     public String getVanillaName() {
         return this.self ? this.name() : this.aliases[0];
     }
@@ -275,7 +274,7 @@ public enum XEnchantment {
      * return a Vanilla  enchantment.
      * since 1.0.0
      */
-    
+
     public Enchantment parseEnchantment() {
         return ISFLAT ? Enchantment.getByKey(NamespacedKey.minecraft(this.getVanillaName().toLowerCase(Locale.ENGLISH)))
                 : Enchantment.getByName(this.name());
@@ -297,7 +296,7 @@ public enum XEnchantment {
         return parseEnchantment() != null;
     }
 
-    
+
     public String[] getAliases() {
         return aliases;
     }

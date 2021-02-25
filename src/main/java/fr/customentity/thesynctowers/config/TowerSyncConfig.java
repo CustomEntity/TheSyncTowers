@@ -4,6 +4,8 @@ import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
 import fr.customentity.thesynctowers.TheSyncTowers;
 import fr.customentity.thesynctowers.data.TowerSync;
+import fr.customentity.thesynctowers.data.TowerSyncManager;
+import fr.customentity.thesynctowers.gson.GsonManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,21 +15,20 @@ import java.util.Set;
 import java.util.logging.Level;
 
 /**
- *  Copyright (c) 2021. By CustomEntity
- *
+ * Copyright (c) 2021. By CustomEntity
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
- *  The above copyright notice and this permission notice shall be included in
+ * <p>
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
  *
  * @Author: CustomEntity
  * @Date: 18/02/2021
- *
  */
 public class TowerSyncConfig {
 
@@ -35,6 +36,10 @@ public class TowerSyncConfig {
 
     @Inject
     private TheSyncTowers plugin;
+    @Inject
+    private GsonManager gsonManager;
+    @Inject
+    private TowerSyncManager towerSyncManager;
 
 
     public void setup() {
@@ -42,7 +47,7 @@ public class TowerSyncConfig {
             plugin.getDataFolder().mkdir();
         }
         try {
-            towerSyncsFile = plugin.getGsonManager().getOrCreateFile("towersyncs.json");
+            towerSyncsFile = this.gsonManager.getOrCreateFile("towersyncs.json");
         } catch (IOException e) {
             plugin.getLogger().log(Level.WARNING, "Error while creating towersyncs file !");
             e.printStackTrace();
@@ -53,9 +58,9 @@ public class TowerSyncConfig {
         Type type = new TypeToken<HashSet<TowerSync>>() {
         }.getType();
         try {
-            Set<TowerSync> nexusSet = (Set<TowerSync>) plugin.getGsonManager().fromJson(towerSyncsFile, type);
+            Set<TowerSync> nexusSet = (Set<TowerSync>) this.gsonManager.fromJson(towerSyncsFile, type);
             if (nexusSet != null) {
-                plugin.getTowerSyncManager().setTowerSyncs(new HashSet<>(nexusSet));
+                this.towerSyncManager.setTowerSyncs(new HashSet<>(nexusSet));
             }
         } catch (IOException e) {
             plugin.getLogger().log(Level.WARNING, "Error while loading towersyncs from towersyncs file !");
@@ -67,7 +72,7 @@ public class TowerSyncConfig {
         Type type = new TypeToken<HashSet<TowerSync>>() {
         }.getType();
         try {
-            if (plugin.getGsonManager().saveJSONToFile(towerSyncsFile, plugin.getTowerSyncManager().getTowerSyncs(), type)) {
+            if (this.gsonManager.saveJSONToFile(towerSyncsFile, this.towerSyncManager.getTowerSyncs(), type)) {
                 plugin.getLogger().log(Level.WARNING, "All TowerSync saved !");
             }
         } catch (IOException e) {

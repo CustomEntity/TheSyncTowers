@@ -28,14 +28,12 @@ import java.util.stream.Collectors;
 @Singleton
 public class TowerSyncManager {
 
-    private final TheSyncTowers plugin;
     private Set<TowerSync> towerSyncs;
 
     private final TowerSync.Factory towerSyncFactory;
 
     @Inject
-    public TowerSyncManager(TheSyncTowers plugin, TowerSync.Factory towerSyncFactory) {
-        this.plugin = plugin;
+    public TowerSyncManager(TowerSync.Factory towerSyncFactory) {
         this.towerSyncs = new HashSet<>();
 
         this.towerSyncFactory = towerSyncFactory;

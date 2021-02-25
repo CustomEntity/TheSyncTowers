@@ -3,9 +3,11 @@ package fr.customentity.thesynctowers.injection;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import fr.customentity.thesynctowers.TheSyncTowers;
+import fr.customentity.thesynctowers.commands.SubCommandExecutor;
 import fr.customentity.thesynctowers.data.RunningTowerSync;
 import fr.customentity.thesynctowers.data.tower.Tower;
 import fr.customentity.thesynctowers.data.TowerSync;
+import fr.customentity.thesynctowers.tasks.RunningTowerSyncTask;
 
 /**
  *  Copyright (c) 2021. By CustomEntity
@@ -41,5 +43,9 @@ public class PluginModule extends AbstractModule {
                 .build(RunningTowerSync.Factory.class));
         this.install(new FactoryModuleBuilder()
                 .build(TowerSync.Factory.class));
+        this.install(new FactoryModuleBuilder()
+                .build(SubCommandExecutor.Factory.class));
+        this.install(new FactoryModuleBuilder()
+                .build(RunningTowerSyncTask.Factory.class));
     }
 }

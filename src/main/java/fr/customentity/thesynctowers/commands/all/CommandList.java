@@ -1,8 +1,12 @@
 package fr.customentity.thesynctowers.commands.all;
 
+import com.google.inject.Inject;
 import fr.customentity.thesynctowers.TheSyncTowers;
 import fr.customentity.thesynctowers.commands.AbstractSubCommand;
+import fr.customentity.thesynctowers.commands.SubCommand;
+import fr.customentity.thesynctowers.data.TowerSyncManager;
 import fr.customentity.thesynctowers.locale.Tl;
+import fr.customentity.thesynctowers.permissible.Perm;
 import org.bukkit.command.CommandSender;
 
 /**
@@ -24,18 +28,17 @@ import org.bukkit.command.CommandSender;
  */
 public class CommandList extends AbstractSubCommand {
 
-    public CommandList(TheSyncTowers plugin, String commandName, String permission, String... aliases) {
-        super(plugin, commandName, permission, aliases);
-    }
+    @Inject
+    private TowerSyncManager towerSyncManager;
 
-    @Override
-    protected void execute(CommandSender sender, String command, String[] args) {
-        if (this.getPlugin().getTowerSyncManager().getTowerSyncs().size() == 0) {
+    @SubCommand(subCommand = "list", permission = Perm.COMMAND_LIST)
+    public void execute(CommandSender sender, String[] args) {
+        if (this.towerSyncManager.getTowerSyncs().size() == 0) {
             this.sendMessage(sender, Tl.COMMAND_LIST_EMPTY);
             return;
         }
         this.sendMessage(sender, Tl.COMMAND_LIST_HEADER);
-        this.getPlugin().getTowerSyncManager().getTowerSyncs()
+        this.towerSyncManager.getTowerSyncs()
                 .forEach(towerSync -> Tl.sendConfigMessage(sender, Tl.COMMAND_LIST_TOWERSYNC, towerSync));
         this.sendMessage(sender, Tl.COMMAND_LIST_FOOTER);
     }

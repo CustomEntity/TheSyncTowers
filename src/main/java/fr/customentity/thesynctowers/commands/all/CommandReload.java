@@ -1,8 +1,13 @@
 package fr.customentity.thesynctowers.commands.all;
 
+import com.google.inject.Inject;
 import fr.customentity.thesynctowers.TheSyncTowers;
 import fr.customentity.thesynctowers.commands.AbstractSubCommand;
+import fr.customentity.thesynctowers.commands.SubCommand;
+import fr.customentity.thesynctowers.config.MessagesConfig;
 import fr.customentity.thesynctowers.locale.Tl;
+import fr.customentity.thesynctowers.permissible.Perm;
+import fr.customentity.thesynctowers.settings.Settings;
 import org.bukkit.command.CommandSender;
 
 /**
@@ -24,15 +29,16 @@ import org.bukkit.command.CommandSender;
  */
 public class CommandReload extends AbstractSubCommand {
 
-    public CommandReload(TheSyncTowers plugin, String commandName, String permission, String... aliases) {
-        super(plugin, commandName, permission, aliases);
-    }
+    @Inject
+    private Settings settings;
+    @Inject
+    private MessagesConfig messagesConfig;
 
-    @Override
-    protected void execute(CommandSender sender, String command, String[] args) {
+    @SubCommand(subCommand = "reload", permission = Perm.COMMAND_RELOAD)
+    public void execute(CommandSender sender, String[] args) {
         //this.getPlugin().reloadPlugin();
-        this.getPlugin().getSettings().loadSettings();
-        this.getPlugin().getMessagesConfig().setup();
+        this.settings.loadSettings();
+        this.messagesConfig.setup();
 
         this.sendMessage(sender, Tl.COMMAND_RELOAD_SUCCESS);
     }

@@ -48,8 +48,8 @@ public class TowerSync {
                      @Assisted TowerSync.Type type,
                      @Assisted String name,
                      @Assisted long valueToWin,
-                     @Assisted int timeBeforeEnd,
-                     @Assisted int timeInterval
+                     @Assisted("timeBeforeEnd") int timeBeforeEnd,
+                     @Assisted("timeInterval") int timeInterval
     ) {
         this.plugin = plugin;
         this.towerFactory = towerFactory;
@@ -66,7 +66,7 @@ public class TowerSync {
     }
     public interface Factory {
         TowerSync create(TowerSync.Type type, String name, long valueToWin,
-                         int timeBeforeEnd, int timeInterval);
+                         @Assisted("timeBeforeEnd") int timeBeforeEnd, @Assisted("timeInterval") int timeInterval);
     }
 
     public void stop(EndReason endReason) {

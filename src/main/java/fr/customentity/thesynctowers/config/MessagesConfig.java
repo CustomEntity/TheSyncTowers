@@ -9,23 +9,24 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 /**
- *  Copyright (c) 2021. By CustomEntity
- *
+ * Copyright (c) 2021. By CustomEntity
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
- *  The above copyright notice and this permission notice shall be included in
+ * <p>
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
  *
  * @Author: CustomEntity
  * @Date: 18/02/2021
- *
  */
 @Singleton
 public class MessagesConfig {
@@ -41,18 +42,23 @@ public class MessagesConfig {
             plugin.getDataFolder().mkdir();
         }
 
-        messagesFile = new File(plugin.getDataFolder(), "messages.yml");
-        if (!messagesFile.exists()) {
+        this.messagesFile = new File(plugin.getDataFolder(), "messages.yml");
+        if (!this.messagesFile.exists()) {
             try {
-                messagesFile.createNewFile();
+                this.messagesFile.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
+        this.messagesConfig = YamlConfiguration.loadConfiguration(this.messagesFile);
         for (Tl tl : Tl.values()) {
-            if (!messagesConfig.contains(tl.toString())) {
-                messagesConfig.set(tl.toString(), tl.isList() ? tl.getMessage() : tl.getMessage().get(0));
+            if (!this.messagesConfig.contains(tl.toString())) {
+                this.messagesConfig.set(tl.toString(), tl.isList() ? tl.getMessage() : tl.getMessage().get(0));
+            } else {
+                tl.setMessage(this.messagesConfig.isList(tl.toString()) ?
+                        this.messagesConfig.getStringList(tl.toString()) :
+                        Collections.singletonList(this.messagesConfig.getString(tl.toString()))
+                );
             }
         }
         save();

@@ -1,10 +1,14 @@
 package fr.customentity.thesynctowers.commands.all;
 
+import com.google.inject.Inject;
 import fr.customentity.thesynctowers.TheSyncTowers;
 import fr.customentity.thesynctowers.commands.AbstractSubCommand;
+import fr.customentity.thesynctowers.commands.SubCommand;
 import fr.customentity.thesynctowers.data.TowerSync;
+import fr.customentity.thesynctowers.data.TowerSyncManager;
 import fr.customentity.thesynctowers.data.tower.Tower;
 import fr.customentity.thesynctowers.locale.Tl;
+import fr.customentity.thesynctowers.permissible.Perm;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
@@ -38,17 +42,16 @@ public class CommandEdit extends AbstractSubCommand {
 
     * */
 
-    public CommandEdit(TheSyncTowers plugin, String commandName, String permission, String... aliases) {
-        super(plugin, commandName, permission, aliases);
-    }
+    @Inject
+    private TowerSyncManager towerSyncManager;
 
-    @Override
-    protected void execute(CommandSender sender, String command, String[] args) {
+    @SubCommand(subCommand = "edit", permission = Perm.COMMAND_EDIT)
+    public void execute(CommandSender sender, String[] args) {
         Player player = (Player) sender;
         if (args.length <= 1) {
             this.sendMessage(sender, Tl.COMMAND_EDIT_HELP$MESSAGE);
         } else {
-            Optional<TowerSync> towerSyncOptional = this.getPlugin().getTowerSyncManager().getTowerSyncByName(args[0]);
+            Optional<TowerSync> towerSyncOptional = this.towerSyncManager.getTowerSyncByName(args[0]);
             if (!towerSyncOptional.isPresent()) {
                 this.sendMessage(sender, Tl.GENERAL_TOWERSYNC$NOT$EXISTS);
                 return;
@@ -84,9 +87,8 @@ public class CommandEdit extends AbstractSubCommand {
                         return;
                     }
 
-                    block.getWorld().getBlockAt(block.getLocation()).setType(Material.AIR);
-
                     towerSync.addTower(block.getLocation(), block.getType());
+                    block.getWorld().getBlockAt(block.getLocation()).setType(Material.AIR);
                     this.sendMessage(sender, Tl.COMMAND_EDIT_TOWER_ADD_SUCCESS, towerSync);
                 } else if (args[2].equalsIgnoreCase("remove")) {
                     if (args.length != 4) {

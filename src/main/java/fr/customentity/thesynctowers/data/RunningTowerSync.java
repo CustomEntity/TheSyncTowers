@@ -13,9 +13,8 @@ import fr.customentity.thesynctowers.tasks.StartingTask;
 import fr.customentity.thesynctowers.tasks.SynchronizationTask;
 import org.bukkit.Material;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *  Copyright (c) 2021. By CustomEntity
@@ -37,6 +36,7 @@ import java.util.Optional;
 public class RunningTowerSync {
 
     private final TowerSync towerSync;
+    private final List<IParticipant> participants;
     private final Table<IParticipant, Tower, Long> participantTowerTable;
     private final Map<IParticipant, Long> participantPoints;
     private int timeBeforeEnd;
@@ -48,15 +48,21 @@ public class RunningTowerSync {
     private RunningTowerSyncTask runningTowerSyncTask;
     private Map<IParticipant, SynchronizationTask> synchronizationTaskMap;
 
+    private RunningTowerSyncTask.Factory runningTowerSyncTaskFactory;
+
     @Inject
     public RunningTowerSync(TheSyncTowers plugin,
+                            RunningTowerSyncTask.Factory runningTowerSyncTaskFactory,
                             @Assisted TowerSync towerSync, @Assisted boolean now) {
         this.plugin = plugin;
         this.towerSync = towerSync;
+        this.participants = new ArrayList<>();
         this.participantTowerTable = HashBasedTable.create();
         this.participantPoints = new HashMap<>();
         this.timeBeforeEnd = towerSync.getTimeBeforeEnd();
         this.synchronizationTaskMap = new HashMap<>();
+
+        this.runningTowerSyncTaskFactory = runningTowerSyncTaskFactory;
 
         if (now) {
             this.start();
@@ -71,11 +77,20 @@ public class RunningTowerSync {
     }
 
     public void start() {
-        this.runningTowerSyncTask = new RunningTowerSyncTask(this.plugin, this);
+        this.runningTowerSyncTask = this.runningTowerSyncTaskFactory.create(this);
         this.runningTowerSyncTask.runTaskTimer(plugin, 20, 20);
 
         this.towerSync.getTowers().forEach(tower -> tower.getLocation().getWorld()
                 .getBlockAt(tower.getLocation()).setType(tower.getMaterial()));
+    }
+
+    public List<IParticipant> getParticipants() {
+        return participants;
+    }
+
+    public Optional<IParticipant> getParticipantByName(String name) {
+        return this.participants.stream().filter(participant ->
+                participant.getParticipantName().equalsIgnoreCase(name)).findAny();
     }
 
     public void stop(EndReason endReason) {
@@ -87,7 +102,21 @@ public class RunningTowerSync {
         this.towerSync.getTowers().forEach(tower -> tower.getLocation().getWorld()
                 .getBlockAt(tower.getLocation()).setType(Material.AIR));
 
-        //TODO: HANDLE END REASON
+        if(endReason == EndReason.TIMEUP) {
+            if(this.towerSync.getType() == TowerSync.Type.TIME) {
+                //TODO: HANDLE THE MOST POINT
+            }
+        }
+    }
+
+    public LinkedHashMap<IParticipant, Long> getTopParticipants() {
+        return this.participantPoints.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue, LinkedHashMap::new));
     }
 
     public int getTimeBeforeEnd() {
@@ -121,7 +150,4 @@ public class RunningTowerSync {
     public Optional<StartingTask> getStartingTask() {
         return Optional.ofNullable(startingTask);
     }
-
-
-
 }

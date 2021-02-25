@@ -65,7 +65,8 @@ dependencies {
     compile 'com.zaxxer:HikariCP:3.4.5'
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7'
     compileOnly 'me.clip:placeholderapi:2.10.9'
-    compileOnly 'org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT'
+    compile 'fr.minuskube:netherboard-bukkit:1.2.1'
+    compile 'org.reflections:reflections:0.9.12'
 }
 
 processResources {
@@ -77,6 +78,7 @@ processResources {
 shadowJar {
     archiveName = "TheSyncTowers.jar"
     exclude('com/google/common/**')
+    exclude('javassist/**')
 }
 
 tasks.build.dependsOn(shadowJar)

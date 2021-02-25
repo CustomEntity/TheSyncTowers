@@ -3,14 +3,15 @@ package fr.customentity.thesynctowers.commands;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import fr.customentity.thesynctowers.TheSyncTowers;
-import fr.customentity.thesynctowers.commands.all.*;
 import fr.customentity.thesynctowers.locale.Tl;
-import fr.customentity.thesynctowers.permissible.Perm;
-import fr.customentity.thesynctowers.utils.Perms;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.reflections.Reflections;
+import org.reflections.scanners.MethodAnnotationsScanner;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -33,33 +34,33 @@ import java.util.*;
 public class SubCommandManager implements CommandExecutor {
 
     private final TheSyncTowers plugin;
-    private final Set<AbstractSubCommand> subCommandSet;
+    private final Set<SubCommandExecutor> subCommandSet;
+
+    private final SubCommandExecutor.Factory subCommandExecutorFactory;
 
     @Inject
-    public SubCommandManager(TheSyncTowers plugin) {
+    public SubCommandManager(TheSyncTowers plugin, SubCommandExecutor.Factory subCommandExecutorFactory) {
         this.plugin = plugin;
         this.subCommandSet = new HashSet<>();
+        this.subCommandExecutorFactory = subCommandExecutorFactory;
 
         Objects.requireNonNull(plugin.getCommand("thesynctowers")).setExecutor(this);
         Objects.requireNonNull(plugin.getCommand("thesynctowers")).setAliases(Collections.singletonList("tst"));
     }
 
-    public void registerCommands() {
-        subCommandSet.add(new CommandCreate(this.plugin, "create", Perm.COMMAND_CREATE.getPermission()));
-        subCommandSet.add(new CommandDelete(this.plugin, "delete", Perm.COMMAND_DELETE.getPermission()));
-        subCommandSet.add(new CommandReload(this.plugin, "reload", Perm.COMMAND_RELOAD.getPermission()));
-        subCommandSet.add(new CommandStart(this.plugin, "start", Perm.COMMAND_START.getPermission()));
-        subCommandSet.add(new CommandNow(this.plugin, "now", Perm.COMMAND_NOW.getPermission()));
-        subCommandSet.add(new CommandEdit(this.plugin, "edit", Perm.COMMAND_EDIT.getPermission()));
-        subCommandSet.add(new CommandStop(this.plugin, "stop", Perm.COMMAND_STOP.getPermission()));
-        subCommandSet.add(new CommandList(this.plugin, "list", Perm.COMMAND_LIST.getPermission()));
+    public void registerCommands(String packageId) {
+        Reflections reflections = new Reflections(packageId, new MethodAnnotationsScanner());
+        reflections.getMethodsAnnotatedWith(SubCommand.class)
+                .forEach(this::registerCommand);
+    }
 
-/*
-        subCommandSet.add(new CommandScheduler("scheduler", Perm.COMMAND_SCHEDULER.getPermission()));
+    private void registerCommand(Method method) {
+        SubCommandExecutor subCommandExecutor = this.subCommandExecutorFactory.create(method);
+        this.registerCommand(subCommandExecutor);
+    }
 
-
-        subCommandSet.add(new CommandReward("reward", Perm.COMMAND_REWARD.getPermission()));
-        subCommandSet.add(new CommandVersion("version", null));*/
+    private void registerCommand(SubCommandExecutor subCommandExecutor) {
+        this.subCommandSet.add(subCommandExecutor);
     }
 
     @Override
@@ -67,15 +68,23 @@ public class SubCommandManager implements CommandExecutor {
         if (args.length == 0) {
             Tl.sendHelpMessage(sender);
         } else {
-            Optional<AbstractSubCommand> optionalSubCommand = subCommandSet.stream().filter(subCommand -> subCommand.getCommandName().equalsIgnoreCase(args[0])).findFirst();
-            if (optionalSubCommand.isPresent()) {
-                AbstractSubCommand subCommand = optionalSubCommand.get();
-                if (subCommand.getPermission() != null && !Perms.has(sender, subCommand.getPermission())) {
+            Optional<SubCommandExecutor> optionalSubCommandExecutor = subCommandSet.stream()
+                    .filter(subCommand -> subCommand.getSubCommand().subCommand().equalsIgnoreCase(args[0])).findFirst();
+            if (optionalSubCommandExecutor.isPresent()) {
+                SubCommandExecutor subCommandExecutor = optionalSubCommandExecutor.get();
+                if (subCommandExecutor.getSubCommand().permission() != null &&
+                        subCommandExecutor.getSubCommand().permission().getPermission() != null
+                        && !subCommandExecutor.getSubCommand().permission().hasPermission(sender)) {
                     Tl.sendConfigMessage(sender, Tl.COMMAND_NO$PERMISSION);
                     return true;
                 }
 
-                subCommand.execute(sender, label, Arrays.copyOfRange(args, 1, args.length));
+                try {
+                    subCommandExecutor.getMethod()
+                            .invoke(subCommandExecutor.getCommandInstance(), sender, Arrays.copyOfRange(args, 1, args.length));
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
                 return true;
             } else {
                 Tl.sendConfigMessage(sender, Tl.GENERAL_HELP$MESSAGE);

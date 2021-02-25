@@ -1,39 +1,48 @@
 package fr.customentity.thesynctowers.locale;
 
+import com.google.inject.Inject;
 import fr.customentity.thesynctowers.TheSyncTowers;
+import fr.customentity.thesynctowers.config.MessagesConfig;
 import fr.customentity.thesynctowers.data.RunningTowerSync;
 import fr.customentity.thesynctowers.data.TowerSync;
+import fr.customentity.thesynctowers.data.participant.IParticipant;
+import fr.customentity.thesynctowers.data.tower.Tower;
 import fr.customentity.thesynctowers.utils.ActionBarUtils;
 import fr.customentity.thesynctowers.utils.TitleUtils;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.text.DecimalFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- *  Copyright (c) 2021. By CustomEntity
- *
+ * Copyright (c) 2021. By CustomEntity
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
- *  The above copyright notice and this permission notice shall be included in
+ * <p>
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
  *
  * @Author: CustomEntity
  * @Date: 18/02/2021
- *
  */
 public enum Tl {
 
-    GENERAL_PREFIX("&3&lTST &7&l» &f"),
+    GENERAL_PREFIX("&3&lTST &7&l»"),
+
+    COMMAND_NOT$NUMBER("%prefix% &c%arg% is not a number !"),
+    COMMAND_NO$PERMISSION("%prefix% &cYou don't have permission to execute that command !"),
 
     COMMAND_CREATE_SYNTAX("%prefix% &cError syntax, please use: /tst create <name>"),
     COMMAND_CREATE_SUCCESS("%prefix% &fThe &b%arg% &ftowersync has been successfully created !"),
@@ -132,18 +141,16 @@ public enum Tl {
     COMMAND_STOP_SUCCESS("%prefix% &fThe &b%towersync_name% &ftowersync has been successfully stopped !"),
 
 
-    GAME_ON$TOWER$ALREADY$BROKEN("%prefix% &cYour team has already destroyed this tower !"),
+    GAME_ON$TOWER$ALREADY$BROKEN("%prefix% &cYour team has already broken this tower !"),
     GAME_SYNCHRONIZATION_SUCCESS("%actionbar%&aSuccessful synchronization! Your team has won &e%point% &apoints!"),
     GAME_SYNCHRONIZATION_PROGRESSION("%actionbar%&eSynchronization in progress... &f(&e%current%&7/&e%goal%&f) &b%time%s remaining"),
     GAME_SYNCHRONIZATION_FAILED("%actionbar%&cSynchronization failed !"),
+    GAME_NOT$IN$A$TEAM("%prefix% &cYou cannot participate without a team!"),
 
 
+    SCOREBOARD_TOP$EMPTY("&c✘"),
 
-
-
-    GENERAL_PHASE$NOT$EXISTS("%prefix% &cThat phase doesn't exist !"),
     GENERAL_REWARD$NOT$EXISTS("%prefix% &cThat reward doesn't exist !"),
-    GENERAL_ACTION$NOT$EXISTS("%prefix% &cThat action doesn't exist !"),
 
     GAME_NEXUS_ON$RELOAD("%prefix% &fThe nexus &b%nexus_name% &fwas stopped by force!"),
     GAME_NEXUS_HEALTH_MESSAGE("%prefix% &fThe nexus is at &b%percent%% &fof its life! Health: &b%runningnexus_health% &4❤"),
@@ -156,12 +163,6 @@ public enum Tl {
     GAME_ON$DAMAGE$NEXUS_SKYBLOCK_DOESNT$HAVE$ISLAND("%prefix% &cYou have to join an island to participate !"),
     GAME_ON$DAMAGE$NEXUS_GANG_DOESNT$HAVE$GANG("%prefix% &cYou have to join a gang to participate !"),
     GAME_ON$DAMAGE$NEXUS_CLANS_DOESNT$HAVE$GANG("%prefix% &cYou have to join a clan to participate !"),
-
-
-    SCOREBOARD_TOP$EMPTY("&c✘"),
-
-    COMMAND_NOT$NUMBER("%prefix% &c%arg% is not a number !"),
-    COMMAND_NO$PERMISSION("%prefix% &cYou don't have permission to execute that command !"),
 
 
     COMMAND_SCHEDULER_HELP$MESSAGE(Arrays.asList(
@@ -242,40 +243,155 @@ public enum Tl {
     COMMAND_REWARD_DELETE_SUCCESS("%prefix% &fYou have successfully deleted the reward to the nexus &b%nexus_name%&f."),
     ;
 
-
-    private final List<String> defaultMessage;
+    private List<String> message;
     private final String path;
 
     private final TheSyncTowers plugin;
 
-    Tl(String defaultMessage) {
-        this.defaultMessage = Collections.singletonList(defaultMessage);
+    Tl(String message) {
+        this.message = Collections.singletonList(message);
         this.path = this.name().replace("_", ".").replace("$", "-");
 
         this.plugin = JavaPlugin.getPlugin(TheSyncTowers.class);
     }
 
     Tl(List<String> listDefaultMessages) {
-        this.defaultMessage = listDefaultMessages;
+        this.message = listDefaultMessages;
         this.path = this.name().replace("_", ".").replace("$", "-");
         this.plugin = JavaPlugin.getPlugin(TheSyncTowers.class);
     }
 
-    public List<String> getMessage() {
-        return defaultMessage;
+    public void setMessage(List<String> message) {
+        this.message = message;
     }
 
-    public List<String> getConfigMessages() {
-        String serialized = this.toString();
-        return plugin.getMessagesConfig().get().isList(serialized) ? plugin.getMessagesConfig().get().getStringList(serialized) : Collections.singletonList(plugin.getMessagesConfig().get().getString(serialized));
+    public static void init(FileConfiguration fileConfiguration) {
+
+    }
+
+    public List<String> getMessage() {
+        return message;
     }
 
     public boolean isList() {
-        return defaultMessage.size() != 1;
+        return message.size() != 1;
     }
 
-    public static void sendConfigMessageToPlayer(Player player, Tl tl, String... replace) {
-        sendConfigMessage(Collections.singletonList(player), tl, replace);
+
+    public static String addTowerSyncPlaceholder(TowerSync towerSync, String toReplace) {
+        return toReplace.replace("%towersync_name%", towerSync.getName())
+                .replace("%towersync_timeinterval%", towerSync.getTimeInterval() + "")
+                .replace("%towersync_type%", towerSync.getType().name() + "")
+                .replace("%towersync_goal%", towerSync.getValueToWin() + "")
+                .replace("%towersync_timebeforeend%", towerSync.getTimeBeforeEnd() + "")
+                .replace("%towersync_towerscount%", towerSync.getTowers().size() + "")
+                ;
+    }
+
+    public static String addRunningTowerSyncPlaceholder(RunningTowerSync runningTowerSync, String toReplace) {
+        String replaced = addTowerSyncPlaceholder(runningTowerSync.getTowerSync(), toReplace);
+        return replaced
+                .replace("%runningtowersync_health%", "")
+                .replace("%runningtowersync_timeremaining%", runningTowerSync.getTimeBeforeEnd() + "")
+                ;
+    }
+
+    public static List<String> addRunningTowerSyncPlaceholder(RunningTowerSync runningTowerSync, List<String> toReplace) {
+        return toReplace.stream().map(s -> addRunningTowerSyncPlaceholder(runningTowerSync, s)).collect(Collectors.toList());
+    }
+
+    public static String addTowerPlaceholder(Tower tower, String toReplace) {
+        return toReplace
+                .replace("%tower_material%", tower.getMaterial().name())
+                ;
+    }
+
+    public static List<String> addTopPlaceholder(RunningTowerSync runningTowerSync, Player player, List<String> toReplace) {
+        return toReplace.stream().map(s -> addTopPlaceholder(runningTowerSync, player, s)).collect(Collectors.toList());
+    }
+
+    public static String addTopPlaceholder(RunningTowerSync runningTowerSync, Player player, String toReplace) {
+        String replaced = toReplace;
+        LinkedList<IParticipant> participants = new LinkedList<>(runningTowerSync.getTopParticipants().keySet());
+
+        Optional<IParticipant> participant = runningTowerSync.getParticipantByName(player.getName());
+        if (participant.isPresent() && participants.contains(participant.get()))
+            replaced = replaced.replace("%towersync_player_top%", participants.indexOf(participant.get()) + 1 + "");
+        else
+            replaced = replaced.replace("%towersync_player_top%", Tl.SCOREBOARD_TOP$EMPTY.getMessage().get(0));
+
+        for (int i = 1; i < 10; i++) {
+            if (participants.size() < i) {
+                replaced = replaced.replace("%towersync_top_" + i + "%", Tl.SCOREBOARD_TOP$EMPTY.getMessage().get(0))
+                        .replace("%towersync_top_" + i + "_points%", "");
+            } else {
+                replaced = replaced.replace("%towersync_top_" + i + "%", participants.get(i - 1).getParticipantName())
+                        .replace("%towersync_top_" + i + "_points%", "" +
+                                runningTowerSync.getParticipantPoints().get(participants.get(i - 1))
+                        );
+            }
+        }
+        return replaced;
+    }
+
+/*    public static void sendConfigMessage(CommandSender sender, Tl tl, INexus nexus, IReward reward, String... replace) {
+        HashMap<String, String> replaced = new HashMap<>();
+        List<String> replaceList = Arrays.asList(replace);
+        int index = 0;
+        for (String str : replaceList) {
+            index++;
+            if (index % 2 == 0) continue;
+            replaced.put(str, replaceList.get(index));
+        }
+        tl.getConfigMessages().forEach(s -> sendConfigMessage(sender, addNexusPlaceholder(nexus, addNexusRewardPlaceholder(reward, s)), replaced));
+    }*/
+
+    public static void sendConfigMessage(CommandSender sender, Tl tl, TowerSync towerSync, String... replace) {
+        HashMap<String, String> replaced = new HashMap<>();
+        List<String> replaceList = Arrays.asList(replace);
+        int index = 0;
+        for (String str : replaceList) {
+            index++;
+            if (index % 2 == 0) continue;
+            replaced.put(str, replaceList.get(index));
+        }
+        tl.getMessage().forEach(s -> sendConfigMessage(sender, addTowerSyncPlaceholder(towerSync, s), replaced));
+    }
+
+    public static void sendConfigMessage(CommandSender sender, Tl tl, Tower tower, String... replace) {
+        HashMap<String, String> replaced = new HashMap<>();
+        List<String> replaceList = Arrays.asList(replace);
+        int index = 0;
+        for (String str : replaceList) {
+            index++;
+            if (index % 2 == 0) continue;
+            replaced.put(str, replaceList.get(index));
+        }
+        tl.getMessage().forEach(s -> sendConfigMessage(sender, addTowerPlaceholder(tower, s), replaced));
+    }
+
+    public static void sendConfigMessage(CommandSender sender, Tl tl, RunningTowerSync runningTowerSync, String... replace) {
+        HashMap<String, String> replaced = new HashMap<>();
+        List<String> replaceList = Arrays.asList(replace);
+        int index = 0;
+        for (String str : replaceList) {
+            index++;
+            if (index % 2 == 0) continue;
+            replaced.put(str, replaceList.get(index));
+        }
+        tl.getMessage().forEach(s -> sendConfigMessage(sender, addRunningTowerSyncPlaceholder(runningTowerSync, s), replaced));
+    }
+
+    public static void sendConfigMessage(CommandSender sender, Tl tl, String... replace) {
+        HashMap<String, String> replaced = new HashMap<>();
+        List<String> replaceList = Arrays.asList(replace);
+        int index = 0;
+        for (String str : replaceList) {
+            index++;
+            if (index % 2 == 0) continue;
+            replaced.put(str, replaceList.get(index));
+        }
+        tl.getMessage().forEach(s -> sendConfigMessage(sender, s, replaced));
     }
 
     public static void sendConfigMessageToPlayers(List<Player> players, Tl tl, String... replace) {
@@ -287,40 +403,14 @@ public enum Tl {
             if (index % 2 == 0) continue;
             replaced.put(str, replaceList.get(index));
         }
-        players.forEach(player -> tl.getConfigMessages().forEach(s -> sendConfigMessage(player, s, replaced)));
-    }
-
-    public static void sendConfigMessage(CommandSender sender, Tl tl, String... replace) {
-        sendConfigMessage(Collections.singletonList(sender), tl, replace);
-    }
-
-    public static void sendConfigMessage(List<CommandSender> commandSenders, Tl tl, String... replace) {
-        HashMap<String, String> replaced = new HashMap<>();
-        List<String> replaceList = Arrays.asList(replace);
-        int index = 0;
-        for (String str : replaceList) {
-            index++;
-            if (index % 2 == 0) continue;
-            replaced.put(str, replaceList.get(index));
-        }
-        commandSenders.forEach(commandSender -> tl.getConfigMessages().forEach(s -> sendConfigMessage(commandSender, s, replaced)));
-    }
-
-    public static void sendConfigMessage(CommandSender sender, Tl tl, RunningTowerSync runningTowerSync, String... replace) {
-        //TODO: REPLACE
-        sendConfigMessage(sender, tl, "");
-    }
-
-    public static void sendConfigMessage(CommandSender sender, Tl tl, TowerSync towerSync, String... replace) {
-        //TODO: REPLACE
-        sendConfigMessage(sender, tl, "");
+        players.forEach(player -> tl.getMessage().forEach(s -> sendConfigMessage(player, s, replaced)));
     }
 
     private static void sendConfigMessage(CommandSender commandSender, String configMessage, HashMap<String, String> replaced) {
         if (commandSender instanceof Player) {
             sendConfigMessage(((Player) commandSender), configMessage, replaced);
         } else {
-            String message = ChatColor.translateAlternateColorCodes('&', configMessage.replace("%sender%", commandSender.getName()).replace("%prefix%", Tl.GENERAL_PREFIX.getConfigMessages().get(0)));
+            String message = ChatColor.translateAlternateColorCodes('&', configMessage.replace("%sender%", commandSender.getName()).replace("%prefix%", Tl.GENERAL_PREFIX.getMessage().get(0)));
             if (message.isEmpty()) return;
             for (Map.Entry<String, String> stringEntry : replaced.entrySet()) {
                 message = message.replace(stringEntry.getKey(), stringEntry.getValue());
@@ -330,7 +420,7 @@ public enum Tl {
     }
 
     private static void sendConfigMessage(Player player, String configMessage, HashMap<String, String> replaced) {
-        String message = ChatColor.translateAlternateColorCodes('&', configMessage.replace("%sender%", player.getName()).replace("%prefix%", Tl.GENERAL_PREFIX.getConfigMessages().get(0)));
+        String message = ChatColor.translateAlternateColorCodes('&', configMessage.replace("%sender%", player.getName()).replace("%prefix%", Tl.GENERAL_PREFIX.getMessage().get(0)));
         if (message.isEmpty()) return;
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI"))
             message = PlaceholderAPI.setPlaceholders(player, message);

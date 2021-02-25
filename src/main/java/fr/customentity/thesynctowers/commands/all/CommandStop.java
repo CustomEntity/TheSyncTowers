@@ -1,10 +1,14 @@
 package fr.customentity.thesynctowers.commands.all;
 
+import com.google.inject.Inject;
 import fr.customentity.thesynctowers.TheSyncTowers;
 import fr.customentity.thesynctowers.commands.AbstractSubCommand;
+import fr.customentity.thesynctowers.commands.SubCommand;
 import fr.customentity.thesynctowers.data.EndReason;
 import fr.customentity.thesynctowers.data.TowerSync;
+import fr.customentity.thesynctowers.data.TowerSyncManager;
 import fr.customentity.thesynctowers.locale.Tl;
+import fr.customentity.thesynctowers.permissible.Perm;
 import org.bukkit.command.CommandSender;
 
 import java.util.Optional;
@@ -28,16 +32,15 @@ import java.util.Optional;
  */
 public class CommandStop extends AbstractSubCommand {
 
-    public CommandStop(TheSyncTowers plugin, String commandName, String permission, String... aliases) {
-        super(plugin, commandName, permission, aliases);
-    }
+    @Inject
+    private TowerSyncManager towerSyncManager;
 
-    @Override
-    protected void execute(CommandSender sender, String command, String[] args) {
+    @SubCommand(subCommand = "stop", permission = Perm.COMMAND_STOP)
+    public void execute(CommandSender sender, String[] args) {
         if (args.length == 0) {
             Tl.sendConfigMessage(sender, Tl.COMMAND_STOP_SYNTAX);
         } else {
-            Optional<TowerSync> towerSyncOptional = this.getPlugin().getTowerSyncManager().getTowerSyncByName(args[0]);
+            Optional<TowerSync> towerSyncOptional = this.towerSyncManager.getTowerSyncByName(args[0]);
             if (!towerSyncOptional.isPresent()) {
                 Tl.sendConfigMessage(sender, Tl.COMMAND_START_NOT$EXISTS, "%towersync%", args[0]);
                 return;

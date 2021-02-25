@@ -49,12 +49,13 @@ public class SynchronizationTask extends BukkitRunnable {
         if (this.firstBreakTime + interval <= System.currentTimeMillis()) {
             Tl.sendConfigMessageToPlayers(participant.getPlayerParticipants(), Tl.GAME_SYNCHRONIZATION_FAILED);
             rowMap.clear();
+            runningTowerSync.getSynchronizationTaskMap().remove(participant);
             this.cancel();
         } else {
             Tl.sendConfigMessageToPlayers(participant.getPlayerParticipants(), Tl.GAME_SYNCHRONIZATION_PROGRESSION,
                     "%current%", rowMap.size() + "",
                     "%goal%", runningTowerSync.getTowerSync().getTowers().size() + "",
-                    "%time%", String.format("%.2f", (double)(this.firstBreakTime + interval - System.currentTimeMillis()))
+                    "%time%", String.format("%.3f", (double)(this.firstBreakTime + interval - System.currentTimeMillis()) / 1000)
             );
         }
 
