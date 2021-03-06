@@ -3,8 +3,11 @@ package fr.customentity.thesynctowers.listeners;
 
 import com.google.inject.Inject;
 import fr.customentity.thesynctowers.TheSyncTowers;
+import fr.customentity.thesynctowers.data.RunningTowerSync;
+import fr.customentity.thesynctowers.data.TowerSync;
 import fr.customentity.thesynctowers.data.TowerSyncManager;
 import fr.customentity.thesynctowers.data.tower.Tower;
+import fr.customentity.thesynctowers.utils.pair.Pair;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -42,13 +45,17 @@ public class BlockListener implements Listener {
         Player player = event.getPlayer();
         Block block = event.getBlock();
 
-        Optional<Tower> towerOptional = this.towerSyncManager.getRunningTowerSyncs().stream()
-                .flatMap(towerSync -> towerSync.getTowers().stream())
-                .filter(tower -> tower.getLocation().equals(block.getLocation()))
-                .findAny();
+        Pair<TowerSync, Tower> towerSyncTowerPair = null;
+        for(TowerSync runningTowerSync : this.towerSyncManager.getRunningTowerSyncs()) {
+            for(Tower tower : runningTowerSync.getTowers()) {
+                if(block.getLocation().equals(tower.getLocation())) {
+                    towerSyncTowerPair = Pair.of(runningTowerSync, tower);
+                }
+            }
+        }
 
-        if (!towerOptional.isPresent()) return;
-        towerOptional.get().handleBreak(player);
+        if(towerSyncTowerPair == null)return;
         event.setCancelled(true);
+        towerSyncTowerPair.getLeft().getRunningTowerSync().get().handleTowerBreak(towerSyncTowerPair.getRight(), player);
     }
 }

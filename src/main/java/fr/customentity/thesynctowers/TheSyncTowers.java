@@ -4,12 +4,14 @@ import com.google.inject.Guice;
 import com.google.inject.Inject;
 import fr.customentity.thesynctowers.commands.SubCommandManager;
 import fr.customentity.thesynctowers.config.MessagesConfig;
+import fr.customentity.thesynctowers.config.SchedulersConfig;
 import fr.customentity.thesynctowers.config.TowerSyncConfig;
 import fr.customentity.thesynctowers.hook.HookManager;
 import fr.customentity.thesynctowers.injection.PluginModule;
 import fr.customentity.thesynctowers.listeners.ListenerManager;
-import fr.customentity.thesynctowers.locale.Tl;
 import fr.customentity.thesynctowers.settings.Settings;
+import fr.customentity.thesynctowers.tasks.SchedulerTask;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -41,28 +43,46 @@ public final class TheSyncTowers extends JavaPlugin {
     @Inject
     private TowerSyncConfig towerSyncConfig;
     @Inject
+    private SchedulersConfig schedulersConfig;
+    @Inject
     private Settings settings;
+    @Inject
+    private SchedulerTask schedulerTask;
 
 
     @Override
     public void onEnable() {
         this.saveDefaultConfig();
 
+        ULicense uLicense = new ULicense(this, this.getConfig().getString("license-key"),
+                "http://188.213.31.87:80/api/v1",
+                "1d61fb584a97f8c2a3376d61a1f78896e581814f");
+
+        if(!uLicense.verify()) {
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+
         Guice.createInjector(new PluginModule(this));
 
         this.listenerManager.registerListeners();
 
-        this.subCommandManager.registerCommands(this.getClass().getPackage().getName());
+        this.subCommandManager.registerCommands(this.getClass().getPackage().getName() + ".commands.all");
 
         this.messagesConfig.setup();
-        Tl.init(this.messagesConfig.get());
+
+        this.schedulersConfig.setup();
+        this.schedulersConfig.loadSchedulers();
 
         this.towerSyncConfig.setup();
         this.towerSyncConfig.loadTowerSyncs();
 
+        this.settings.registerSettings();
         this.settings.loadSettings();
 
         this.hookManager.onEnable();
+
+        this.schedulerTask.runTaskTimer(this, 20L, 20L);
 
 
         System.out.println(
@@ -75,12 +95,13 @@ public final class TheSyncTowers extends JavaPlugin {
                         "                             __/ |                                        \n" +
                         "                            |___/                                         \n\n                  TheSyncTowers - " + this.getDescription().getVersion() + " ENABLED ! \n\n");
 
-        Metrics metrics = new Metrics(this);
+        new Metrics(this);
     }
 
     @Override
     public void onDisable() {
         this.towerSyncConfig.saveTowerSyncs();
+        this.schedulersConfig.saveSchedulers();
         this.hookManager.onDisable();
     }
 

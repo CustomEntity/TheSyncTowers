@@ -8,11 +8,13 @@ import fr.customentity.thesynctowers.data.RunningTowerSync;
 import fr.customentity.thesynctowers.data.TowerSync;
 import fr.customentity.thesynctowers.hook.HookManager;
 import fr.customentity.thesynctowers.hook.all.FeatherboardHook;
+import fr.customentity.thesynctowers.hook.all.TitleManagerHook;
 import fr.customentity.thesynctowers.locale.Tl;
 import fr.customentity.thesynctowers.settings.Settings;
 import fr.customentity.thesynctowers.utils.ColorUtils;
 import fr.minuskube.netherboard.Netherboard;
 import fr.minuskube.netherboard.bukkit.BPlayerBoard;
+import io.puharesource.mc.titlemanager.TitleManagerPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -61,6 +63,10 @@ public class ScoreboardManager implements Listener {
         if (!this.hasScoreBoard(player)) {
             if (this.hookManager.isHookEnabled(FeatherboardHook.class)) {
                 FeatherBoardAPI.toggle(player, false);
+            } else if (this.hookManager.isHookEnabled(TitleManagerHook.class)) {
+                TitleManagerPlugin titleManagerPlugin = (TitleManagerPlugin) Bukkit.getPluginManager().getPlugin("TitleManager");
+                if (titleManagerPlugin != null)
+                    titleManagerPlugin.removeScoreboard(player);
             }
 
             BPlayerBoard bPlayerBoard = Netherboard.instance().createBoard(player,
@@ -83,23 +89,27 @@ public class ScoreboardManager implements Listener {
 
 
     public void removeScoreboard(TowerSync towerSync) {
-        for (Iterator<Map.Entry<Player, Scoreboard>> it = boardHashMap.entrySet().iterator(); it.hasNext(); ) {
+        for (Iterator<Map.Entry<Player, Scoreboard>> it = this.boardHashMap.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<Player, Scoreboard> entry = it.next();
             if (entry.getValue().getTowerSync().equals(towerSync)) {
                 entry.getValue().getbPlayerBoard().delete();
-                it.remove();
+                this.boardHashMap.remove(entry.getKey());
             }
         }
-
-        Bukkit.getOnlinePlayers().forEach(this::removeScoreboard);
     }
 
     public void removeScoreboard(Player player) {
         if (this.hasScoreBoard(player)) {
-            boardHashMap.get(player).getbPlayerBoard().delete();
-            boardHashMap.remove(player);
+            this.boardHashMap.get(player).getbPlayerBoard().delete();
+            this.boardHashMap.remove(player);
 
-            if (this.hookManager.isHookEnabled(FeatherboardHook.class)) FeatherBoardAPI.toggle(player, true);
+            if (this.hookManager.isHookEnabled(FeatherboardHook.class))
+                FeatherBoardAPI.toggle(player, true);
+            else if (this.hookManager.isHookEnabled(TitleManagerHook.class)) {
+                TitleManagerPlugin titleManagerPlugin = (TitleManagerPlugin) Bukkit.getPluginManager().getPlugin("TitleManager");
+                if (titleManagerPlugin != null)
+                    titleManagerPlugin.giveScoreboard(player);
+            }
         }
     }
 

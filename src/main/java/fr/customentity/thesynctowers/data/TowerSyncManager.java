@@ -4,6 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.Assisted;
 import fr.customentity.thesynctowers.TheSyncTowers;
+import fr.customentity.thesynctowers.data.reward.Reward;
+import fr.customentity.thesynctowers.data.tower.Tower;
 import org.bukkit.Location;
 
 import java.util.*;
@@ -28,16 +30,9 @@ import java.util.stream.Collectors;
 @Singleton
 public class TowerSyncManager {
 
-    private Set<TowerSync> towerSyncs;
+    private Set<TowerSync> towerSyncs = new HashSet<>();
 
-    private final TowerSync.Factory towerSyncFactory;
-
-    @Inject
-    public TowerSyncManager(TowerSync.Factory towerSyncFactory) {
-        this.towerSyncs = new HashSet<>();
-
-        this.towerSyncFactory = towerSyncFactory;
-    }
+    @Inject private TowerSync.Factory towerSyncFactory;
 
     public boolean isTowerBlockAtLocation(Location location) {
         return this.getRunningTowerSyncs().stream()
@@ -56,8 +51,9 @@ public class TowerSyncManager {
         return towerSyncs.stream().filter(towerSync -> towerSync.getName().equalsIgnoreCase(name)).findFirst();
     }
 
-    public TowerSync createTowerSync(TowerSync.Type type, String name, long valueToWin, int timeBeforeEnd, int timeInterval) {
-        TowerSync towerSync = towerSyncFactory.create(type, name, valueToWin, timeBeforeEnd, timeInterval);
+    public TowerSync createTowerSync(TowerSync.Type type, String name, long valueToWin, int timeBeforeEnd, int timeInterval,
+                                     List<Tower> towers, List<Reward> rewards) {
+        TowerSync towerSync = towerSyncFactory.create(type, name, valueToWin, timeBeforeEnd, timeInterval, towers, rewards);
         this.towerSyncs.add(towerSync);
         return towerSync;
     }

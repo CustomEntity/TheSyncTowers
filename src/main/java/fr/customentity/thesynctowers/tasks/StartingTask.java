@@ -42,9 +42,11 @@ public class StartingTask extends BukkitRunnable {
     @Override
     public void run() {
         if (this.messages.contains(this.timeRemaining)) {
-            Bukkit.getOnlinePlayers().forEach(player ->
-                    Tl.sendConfigMessage(player, Tl.GAME_COOLDOWN_MESSAGE, this.runningTowerSync, "%minutes%",
-                            TimeUtils.minutesFromSeconds(timeRemaining) + "", "%seconds%", TimeUtils.secondsFromSeconds(timeRemaining) + ""));
+            Bukkit.getOnlinePlayers().forEach(player -> {
+                    Tl.sendConfigMessage(player, Tl.GAME_COOLDOWN_MESSAGE_HEADER, this.runningTowerSync, "%minutes%",
+                            TimeUtils.minutesFromSeconds(timeRemaining) + "", "%seconds%", TimeUtils.secondsFromSeconds(timeRemaining) + "");
+                    this.runningTowerSync.getTowerSync().getTowers().forEach(tower -> Tl.sendConfigMessage(player, Tl.GAME_COOLDOWN_MESSAGE_TOWER, tower));
+            });
         }
         if (timeRemaining == 0) {
             this.runningTowerSync.start();

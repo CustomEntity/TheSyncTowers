@@ -11,21 +11,20 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *  Copyright (c) 2021. By CustomEntity
- *
+ * Copyright (c) 2021. By CustomEntity
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
- *  The above copyright notice and this permission notice shall be included in
+ * <p>
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
  *
  * @Author: CustomEntity
  * @Date: 18/02/2021
- *
  */
 
 @Singleton
@@ -41,26 +40,31 @@ public class Settings {
     public static final Setting<Boolean> SCOREBOARD_CHECK_DISTANCE_TO_APPLY = new BooleanSetting("scoreboard.check-distance-to-apply", true);
     public static final Setting<Integer> SCOREBOARD_DISTANCE_TO_APPLY_VALUE = new IntSetting("scoreboard.distance-to-apply-value", 20);
 
+    public static final Setting<Boolean> ITEMS_RESTRICTION_ENABLED = new
+            BooleanSetting("settings.items-restriction.restriction", true);
+    public static final Setting<String> ITEMS_RESTRICTION_TYPE = new
+            StringSetting("settings.items-restriction.restriction-type", "WHITELIST");
+    public static final Setting<List<String>> ITEMS_RESTRICTION_ITEMS = new
+            StringListSetting("settings.items-restriction.restriction", Arrays.asList("DIAMOND_SWORD",
+            "IRON_SWORD", "GOLDEN_SWORD", "WOODEN_SWORD"
+    ));
 
+    @Inject private TheSyncTowers plugin;
     private final Set<Setting<?>> settingList = new HashSet<>();
-    private final TheSyncTowers plugin;
 
-    @Inject
-    public Settings(TheSyncTowers plugin) {
-        this.plugin = plugin;
-
-        this.registerSettings();
-    }
 
     public void registerSettings() {
-        registerSetting(
+        this.registerSetting(
                 SAVE_DATAS_DELAY,
                 START_COOLDOWN_MESSAGES_IN_SECOND,
                 START_COOLDOWN_IN_SECOND,
                 PARTICIPANT_TYPE,
                 SCOREBOARD_ENABLED,
                 SCOREBOARD_CHECK_DISTANCE_TO_APPLY,
-                SCOREBOARD_DISTANCE_TO_APPLY_VALUE
+                SCOREBOARD_DISTANCE_TO_APPLY_VALUE,
+                ITEMS_RESTRICTION_ENABLED,
+                ITEMS_RESTRICTION_TYPE,
+                ITEMS_RESTRICTION_ITEMS
         );
     }
 

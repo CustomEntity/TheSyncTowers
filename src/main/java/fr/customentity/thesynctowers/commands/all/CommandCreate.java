@@ -10,6 +10,8 @@ import fr.customentity.thesynctowers.locale.Tl;
 import fr.customentity.thesynctowers.permissible.Perm;
 import org.bukkit.command.CommandSender;
 
+import java.util.ArrayList;
+
 /**
  *  Copyright (c) 2021. By CustomEntity
  *
@@ -43,7 +45,7 @@ public class CommandCreate extends AbstractSubCommand {
                 return;
             }
             this.towerSyncManager.createTowerSync(TowerSync.Type.TIME, name, 0,
-                    300, 5000);
+                    300, 5000, new ArrayList<>(), new ArrayList<>());
             Tl.sendConfigMessage(sender, Tl.COMMAND_CREATE_SUCCESS, "%arg%", name);
         }
     }

@@ -1,3 +1,4 @@
+license-key: "PUT_YOUR_LICENSE_HERE"
 settings:
   start-cooldown-in-second: 300
   start-cooldown-messages-in-second:
@@ -9,45 +10,47 @@ settings:
     - 30
     - 15
     - 10
-    - 9
-    - 8
-    - 7
-    - 6
-    - 5
-    - 4
-    - 3
-    - 2
-    - 1
   # PLAYER | FACTION | GANG | SKYBLOCK
   participant-type: PLAYER
+  items-restriction:
+    restriction: true
+    # WHITELIST | BLACKLIST
+    restriction-type: WHITELIST
+    items:
+      - "DIAMOND_SWORD"
+      - "IRON_SWORD"
+      - "GOLDEN_SWORD"
+      - "WOODEN_SWORD"
 
 
 scoreboard:
   enabled: true
   check-distance-to-apply: false
   distance-to-apply-value: 20
-  name: "&c☀ TheSyncTowers ☀"
+  name: "&f☀ &3TheSyncTowers &f☀"
   lines-type-point:
-    - "&3 "
-    - "&dName: &a%towersync_name%"
-    - "&dGoal: &a%towersync_goal%"
+    - "&7&m---------------------------"
+    - "&3Name: &b%towersync_name%"
+    - "&3Goal: &b%towersync_goal%"
     - "&c "
-    - "&eClassement:"
+    - "&bClassement:"
     - "&f "
-    - "&6> 1. &e%towersync_top_1% &6%towersync_top_1_points%"
-    - "&6> 2. &e%towersync_top_2% &6%towersync_top_2_points%"
-    - "&6> 3. &e%towersync_top_3% &6%towersync_top_3_points%"
-    - "..."
-    - "&6> %towersync_player_top%. &eYou"
+    - " &b1• &f%towersync_top_1% &f%towersync_top_1_points%"
+    - " &b2• &f%towersync_top_2% &f%towersync_top_2_points%"
+    - " &b3• &f%towersync_top_3% &f%towersync_top_3_points%"
+    - "&c&e "
+    - "&3&l» &b%towersync_player_top%. &3You"
+    - "&f&7&m---------------------------"
   lines-type-time:
-    - "&3 "
-    - "&dName: &a%towersync_name%"
-    - "&dTime Remaining: &a%runningtowersync_timeremaining%"
+    - "&7&m---------------------------"
+    - "&3Name: &b%towersync_name%"
+    - "&3Time Remaining: &b%runningtowersync_timeremaining%"
     - "&c "
-    - "&eClassement:"
+    - "&bClassement:"
     - "&f "
-    - "&6> 1. &e%towersync_top_1% &6%towersync_top_1_points%"
-    - "&6> 2. &e%towersync_top_2% &6%towersync_top_2_points%"
-    - "&6> 3. &e%towersync_top_3% &6%towersync_top_3_points%"
-    - "..."
-    - "&6> %towersync_player_top%. &eYou"
+    - " &b1• &f%towersync_top_1% &f%towersync_top_1_points%"
+    - " &b2• &f%towersync_top_2% &f%towersync_top_2_points%"
+    - " &b3• &f%towersync_top_3% &f%towersync_top_3_points%"
+    - "&c&e "
+    - "&3&l» &b%towersync_player_top%. &3You"
+    - "&f&7&m---------------------------"

@@ -1,5 +1,6 @@
 package fr.customentity.thesynctowers.commands;
 
+import com.google.common.reflect.ClassPath;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import fr.customentity.thesynctowers.TheSyncTowers;
@@ -7,9 +8,8 @@ import fr.customentity.thesynctowers.locale.Tl;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.reflections.Reflections;
-import org.reflections.scanners.MethodAnnotationsScanner;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -49,9 +49,19 @@ public class SubCommandManager implements CommandExecutor {
     }
 
     public void registerCommands(String packageId) {
-        Reflections reflections = new Reflections(packageId, new MethodAnnotationsScanner());
-        reflections.getMethodsAnnotatedWith(SubCommand.class)
-                .forEach(this::registerCommand);
+        try {
+            ClassPath.from(this.getClass().getClassLoader()).getTopLevelClassesRecursive(packageId).forEach(classInfo -> {
+                try {
+                    Arrays.stream(Class.forName(classInfo.getName()).getMethods())
+                            .filter(method -> method.isAnnotationPresent(SubCommand.class))
+                            .forEach(this::registerCommand);
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void registerCommand(Method method) {

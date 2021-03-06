@@ -2,6 +2,7 @@ package fr.customentity.thesynctowers.commands;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
 import fr.customentity.thesynctowers.data.TowerSync;
 
@@ -32,8 +33,8 @@ public class SubCommandExecutor {
     private final SubCommand subCommand;
 
     @Inject
-    public SubCommandExecutor(Injector injector, @Assisted Method method) {
-        this.commandInstance = injector.getInstance(method.getDeclaringClass());
+    public SubCommandExecutor(Provider<Injector> injector, @Assisted Method method) {
+        this.commandInstance = injector.get().getInstance(method.getDeclaringClass());
         this.method = method;
         this.subCommand = method.getAnnotation(SubCommand.class);
     }

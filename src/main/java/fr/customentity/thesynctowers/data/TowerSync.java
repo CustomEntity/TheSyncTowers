@@ -3,6 +3,7 @@ package fr.customentity.thesynctowers.data;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import fr.customentity.thesynctowers.TheSyncTowers;
+import fr.customentity.thesynctowers.data.reward.Reward;
 import fr.customentity.thesynctowers.data.tower.Tower;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,10 +32,11 @@ public class TowerSync {
 
     private TowerSync.Type type;
     private String name;
-    private long valueToWin;
+    private long goal;
     private int timeBeforeEnd;
     private int timeInterval;
     private List<Tower> towers;
+    private List<Reward> rewards;
 
     private transient final TheSyncTowers plugin;
     private transient final Tower.Factory towerFactory;
@@ -47,9 +49,11 @@ public class TowerSync {
                      RunningTowerSync.Factory runningTowerSyncFactory,
                      @Assisted TowerSync.Type type,
                      @Assisted String name,
-                     @Assisted long valueToWin,
+                     @Assisted long goal,
                      @Assisted("timeBeforeEnd") int timeBeforeEnd,
-                     @Assisted("timeInterval") int timeInterval
+                     @Assisted("timeInterval") int timeInterval,
+                     @Assisted List<Tower> towers,
+                     @Assisted List<Reward> rewards
     ) {
         this.plugin = plugin;
         this.towerFactory = towerFactory;
@@ -57,22 +61,24 @@ public class TowerSync {
 
         this.type = type;
         this.name = name;
-        this.valueToWin = valueToWin;
+        this.goal = goal;
         this.timeBeforeEnd = timeBeforeEnd;
         this.timeInterval = timeInterval;
-        this.towers = new ArrayList<>();
+        this.towers = towers;
+        this.rewards = rewards;
 
         this.runningTowerSync = null;
     }
+
     public interface Factory {
-        TowerSync create(TowerSync.Type type, String name, long valueToWin,
-                         @Assisted("timeBeforeEnd") int timeBeforeEnd, @Assisted("timeInterval") int timeInterval);
+        TowerSync create(TowerSync.Type type, String name, long goal,
+                         @Assisted("timeBeforeEnd") int timeBeforeEnd, @Assisted("timeInterval") int timeInterval,
+                         List<Tower> towers, List<Reward> rewards);
     }
 
     public void stop(EndReason endReason) {
         this.getRunningTowerSync().ifPresent(runningTowerSync1 -> runningTowerSync1.stop(endReason));
     }
-
 
 
     public enum Type {
@@ -84,16 +90,28 @@ public class TowerSync {
         return type;
     }
 
+    public List<Reward> getRewards() {
+        return rewards;
+    }
+
+    public void setRewards(List<Reward> rewards) {
+        this.rewards = rewards;
+    }
+
     public int getTimeInterval() {
         return timeInterval;
+    }
+
+    public void setTimeInterval(int timeInterval) {
+        this.timeInterval = timeInterval;
     }
 
     public TheSyncTowers getPlugin() {
         return plugin;
     }
 
-    public long getValueToWin() {
-        return valueToWin;
+    public long getGoal() {
+        return goal;
     }
 
     public void setType(Type type) {
@@ -104,8 +122,8 @@ public class TowerSync {
         this.towers = towers;
     }
 
-    public void setValueToWin(long valueToWin) {
-        this.valueToWin = valueToWin;
+    public void setGoal(long goal) {
+        this.goal = goal;
     }
 
     public void setRunningTowerSync(RunningTowerSync runningTowerSync) {
@@ -128,12 +146,16 @@ public class TowerSync {
         return this.getRunningTowerSync().isPresent();
     }
 
-    public void addTower(Location location, Material material) {
-        towers.add(towerFactory.create(this, location, material));
+    public void addTower(String name, Location location, Material material) {
+        towers.add(towerFactory.create(name, location, material));
     }
 
-    public void removeTower(int id) {
-        towers.remove(id);
+    public void removeTower(String name) {
+        this.towers.removeIf(tower -> tower.getName().equalsIgnoreCase(name));
+    }
+
+    public boolean isTowerExisting(String name) {
+        return this.towers.stream().anyMatch(tower -> tower.getName().equalsIgnoreCase(name));
     }
 
     public String getName() {

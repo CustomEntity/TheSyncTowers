@@ -5,12 +5,14 @@ import com.google.inject.Inject;
 import fr.customentity.thesynctowers.TheSyncTowers;
 import fr.customentity.thesynctowers.data.TowerSync;
 import fr.customentity.thesynctowers.data.TowerSyncManager;
+import fr.customentity.thesynctowers.data.tower.Tower;
 import fr.customentity.thesynctowers.gson.GsonManager;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -40,6 +42,9 @@ public class TowerSyncConfig {
     private GsonManager gsonManager;
     @Inject
     private TowerSyncManager towerSyncManager;
+    @Inject
+    private TowerSync.Factory towerSyncFactory;
+
 
 
     public void setup() {
@@ -58,9 +63,20 @@ public class TowerSyncConfig {
         Type type = new TypeToken<HashSet<TowerSync>>() {
         }.getType();
         try {
-            Set<TowerSync> nexusSet = (Set<TowerSync>) this.gsonManager.fromJson(towerSyncsFile, type);
-            if (nexusSet != null) {
-                this.towerSyncManager.setTowerSyncs(new HashSet<>(nexusSet));
+            Set<TowerSync> towerSyncsSet = (Set<TowerSync>) this.gsonManager.fromJson(towerSyncsFile, type);
+            if (towerSyncsSet != null) {
+                towerSyncsSet.forEach(towerSync -> {
+                    TowerSync newTowerSync = towerSyncFactory.create(towerSync.getType(),
+                            towerSync.getName(),
+                            towerSync.getGoal(),
+                            towerSync.getTimeBeforeEnd(),
+                            towerSync.getTimeInterval(),
+                            towerSync.getTowers(),
+                            towerSync.getRewards()
+                    );
+
+                    this.towerSyncManager.getTowerSyncs().add(newTowerSync);
+                });
             }
         } catch (IOException e) {
             plugin.getLogger().log(Level.WARNING, "Error while loading towersyncs from towersyncs file !");

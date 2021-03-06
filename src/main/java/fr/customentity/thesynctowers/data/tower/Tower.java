@@ -35,78 +35,20 @@ import java.util.Optional;
 public class Tower {
 
 
+    private String name;
     private Location location;
     private Material material;
 
-    private transient TowerSync towerSync;
-
     @Inject
-    public Tower(@Assisted TowerSync towerSync, @Assisted Location location, @Assisted Material material) {
-        this.towerSync = towerSync;
+    public Tower(@Assisted String name, @Assisted Location location, @Assisted Material material) {
+        this.name = name;
         this.location = location;
         this.material = material;
     }
 
+
     public interface Factory {
-        Tower create(TowerSync towerSync, Location location, Material material);
-    }
-
-    public void handleBreak(Player breaker) {
-        Optional<RunningTowerSync> runningTowerSyncOptional = towerSync.getRunningTowerSync();
-        if (!runningTowerSyncOptional.isPresent()) return;
-        RunningTowerSync runningTowerSync = runningTowerSyncOptional.get();
-
-        IParticipant participant = IParticipant.getParticipantFromPlayer(breaker);
-        if (participant == null) {
-            Tl.sendConfigMessage(breaker, Tl.GAME_NOT$IN$A$TEAM, this);
-            return;
-        }
-        Optional<IParticipant> participantOptional = runningTowerSync
-                .getParticipantByName(participant.getParticipantName());
-        if (participantOptional.isPresent()) {
-            participant = participantOptional.get();
-        } else {
-            runningTowerSync.getParticipants().add(participant);
-        }
-
-
-        Table<IParticipant, Tower, Long> participantTowerTable = runningTowerSync.getParticipantsTowerTable();
-        Map<IParticipant, Map<Tower, Long>> rowMap = participantTowerTable.rowMap();
-
-        if (participantTowerTable.contains(participant, this)) {
-            Tl.sendConfigMessage(breaker, Tl.GAME_ON$TOWER$ALREADY$BROKEN, towerSync);
-            return;
-        }
-
-        long lastBreakTime = System.currentTimeMillis();
-        participantTowerTable.put(participant, this, lastBreakTime);
-        long firstBreakTime = rowMap.get(participant).values().stream()
-                .sorted()
-                .findFirst()
-                .get();
-
-        if (rowMap.get(participant).size() == runningTowerSync.getTowerSync().getTowers().size()) {
-            long point = towerSync.getTimeInterval() - (lastBreakTime - firstBreakTime);
-            if (point < 0) return;
-            long currentPoint = runningTowerSync.getParticipantPoints().getOrDefault(participant, 0L);
-            runningTowerSync.getParticipantPoints().put(participant, currentPoint + point);
-
-            Tl.sendConfigMessageToPlayers(participant.getPlayerParticipants(), Tl.GAME_SYNCHRONIZATION_SUCCESS, "%point%", point + "");
-
-            runningTowerSync.getSynchronizationTaskMap().get(participant).cancel();
-            runningTowerSync.getSynchronizationTaskMap().remove(participant);
-            participantTowerTable.row(participant).clear();
-
-            if(towerSync.getType() == TowerSync.Type.POINT && point + currentPoint == towerSync.getValueToWin())
-                runningTowerSync.stop(EndReason.WON);
-
-        } else if (rowMap.get(participant).size() == 1) {
-            if (runningTowerSync.getSynchronizationTaskMap().containsKey(participant)) return;
-            SynchronizationTask synchronizationTask = new SynchronizationTask(participant, runningTowerSync, firstBreakTime);
-            synchronizationTask.runTaskTimer(towerSync.getPlugin(), 0, 1);
-
-            runningTowerSync.getSynchronizationTaskMap().put(participant, synchronizationTask);
-        }
+        Tower create(String name, Location location, Material material);
     }
 
 
@@ -118,7 +60,7 @@ public class Tower {
         return material;
     }
 
-    public TowerSync getTowerSync() {
-        return towerSync;
+    public String getName() {
+        return name;
     }
 }

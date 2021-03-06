@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import fr.customentity.thesynctowers.TheSyncTowers;
 import fr.customentity.thesynctowers.data.RunningTowerSync;
 import fr.customentity.thesynctowers.data.TowerSync;
+import fr.customentity.thesynctowers.data.reward.Reward;
 import fr.customentity.thesynctowers.locale.Tl;
 import fr.customentity.thesynctowers.permissible.Perm;
 import fr.customentity.thesynctowers.utils.Perms;
@@ -63,6 +64,10 @@ public abstract class AbstractSubCommand {
 
     protected void sendMessage(CommandSender sender, Tl tl, TowerSync towerSync, String... replace) {
         Tl.sendConfigMessage(sender, tl, towerSync, replace);
+    }
+
+    protected void sendMessage(CommandSender sender, Tl tl, TowerSync towerSync, Reward reward, String... replace) {
+        Tl.sendConfigMessage(sender, tl, towerSync, reward, replace);
     }
 
     protected void sendMessage(CommandSender sender, Tl tl, RunningTowerSync runningTowerSync, String... replace) {

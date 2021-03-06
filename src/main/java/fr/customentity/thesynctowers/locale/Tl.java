@@ -6,6 +6,7 @@ import fr.customentity.thesynctowers.config.MessagesConfig;
 import fr.customentity.thesynctowers.data.RunningTowerSync;
 import fr.customentity.thesynctowers.data.TowerSync;
 import fr.customentity.thesynctowers.data.participant.IParticipant;
+import fr.customentity.thesynctowers.data.reward.Reward;
 import fr.customentity.thesynctowers.data.tower.Tower;
 import fr.customentity.thesynctowers.utils.ActionBarUtils;
 import fr.customentity.thesynctowers.utils.TitleUtils;
@@ -81,13 +82,21 @@ public enum Tl {
     COMMAND_START_SYNTAX("%prefix% &cError syntax, please use: /tst start <towersync>"),
     COMMAND_START_ALREADY$RUNNING("%prefix% &cThe towersync %towersync% is already running !"),
     COMMAND_START_NOT$EXISTS("%prefix% &cThe towersync %towersync% doesn't exist !"),
-    COMMAND_START_SUCCESS("%prefix% &fThe towersync &b%towersync% &fstarted !"),
+    COMMAND_START_SUCCESS("%prefix% &fThe towersync &b%towersync% &fhas been started !"),
+
 
     COMMAND_LIST_HEADER(Arrays.asList(
             "&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lTOWERSYNCS LIST &3&m--&b&m--&3&m--&b&m--&3&m--",
             " "
     )),
-    COMMAND_LIST_TOWERSYNC("&7&l» &b&l%towersync_name% &8&m-&b &3Example"),
+    COMMAND_LIST_TOWERSYNC(Arrays.asList("&7&l» &b&l%towersync_name%",
+            "   &8▪ &3Type: &b%towersync_type%",
+            "   &8▪ &3Goal: &b%towersync_goal%",
+            "   &8▪ &3Time Interval: &b%towersync_timeinterval%",
+            "   &8▪ &3Towers count: &b%towersync_towerscount%",
+            "   &8▪ &3Time Before End: &b%towersync_timebeforeend%",
+            " "
+    )),
     COMMAND_LIST_FOOTER(" "),
     COMMAND_LIST_EMPTY("%prefix% &cThere is no towersync created!"),
 
@@ -96,6 +105,9 @@ public enum Tl {
             "&3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lTOWERSYNC EDIT &3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--",
             " ",
             " &7&l» &f/&btst edit &3<towersync> &bsettimebeforeend &3<seconds>",
+            " &7&l» &f/&btst edit &3<towersync> &bsettype &3<Point or Time>",
+            " &7&l» &f/&btst edit &3<towersync> &bsetgoal &3<goal>",
+            " &7&l» &f/&btst edit &3<towersync> &bsettimeinterval &3<miliseconds>",
             " &7&l» &f/&btst edit &3<towersync> &btower",
             " ",
             "&3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lTOWERSYNC EDIT &3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--"
@@ -105,168 +117,173 @@ public enum Tl {
             "%prefix% &cError syntax, please use: /tst edit <towersync> settimebeforeend <seconds>"),
     COMMAND_EDIT_SET$TIME$BEFORE$END_SUCCESS("%prefix% &fThe time before the end of the towersync &b%towersync_name% &fhas been set."),
 
+    COMMAND_EDIT_SET$GOAL_SYNTAX(
+            "%prefix% &cError syntax, please use: /tst edit <towersync> setgoal <goal>"),
+    COMMAND_EDIT_SET$GOAL_SUCCESS("%prefix% &fThe goal of the towersync &b%towersync_name% &fhas been set."),
+
+    COMMAND_EDIT_SET$TIMEINTERVAL_SYNTAX(
+            "%prefix% &cError syntax, please use: /tst edit <towersync> settimeinterval <miliseconds>"),
+    COMMAND_EDIT_SET$TIMEINTERVAL_SUCCESS("%prefix% &fThe break interval of the towersync &b%towersync_name% &fhas been set."),
+
+    COMMAND_EDIT_SET$TYPE_SYNTAX(
+            "%prefix% &cError syntax, please use: /tst edit <towersync> settype <Point or Time>"),
+    COMMAND_EDIT_SET$TYPE_SUCCESS("%prefix% &fThe type of the towersync &b%towersync_name% &fhas been set."),
+
+
     COMMAND_EDIT_TOWER_HELP$MESSAGE(Arrays.asList(
             "&3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lTOWER EDIT &3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--",
             " ",
-            " &7&l» &f/&btst edit &3<towersync> &btower add",
-            " &7&l» &f/&btst edit &3<towersync> &btower remove <id>",
+            " &7&l» &f/&btst edit &3<towersync> &btower add <name>",
+            " &7&l» &f/&btst edit &3<towersync> &btower remove <name>",
             " &7&l» &f/&btst edit &3<towersync> &btower list",
             " ",
             "&3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lTOWER EDIT &3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--"
     )),
+
+    COMMAND_EDIT_TOWER_ADD_SYNTAX(
+            "%prefix% &cError syntax, please use: /tst edit <towersync> tower add <name>"),
     COMMAND_EDIT_TOWER_ADD_NO$BLOCK$TARGETED(
             "%prefix% &cYou have to select a block to target !"),
 
     COMMAND_EDIT_TOWER_ADD_SUCCESS(
             "%prefix% &fYou have created a new tower succesfully !"),
+    COMMAND_EDIT_TOWER_ADD_TOWER$ALREADY$EXISTS(
+            "%prefix% &cThat tower already exists !"),
 
     COMMAND_EDIT_TOWER_REMOVE_SYNTAX(
-            "%prefix% &cError syntax, please use: /tst edit <towersync> tower remove <id>"),
+            "%prefix% &cError syntax, please use: /tst edit <towersync> tower remove <name>"),
 
     COMMAND_EDIT_TOWER_REMOVE_SUCCESS(
             "%prefix% &fYou have delete the tower succesfully !"),
 
-    COMMAND_EDIT_TOWER_REMOVE_INCORRECT$ID(
-            "%prefix% &cIncorrect ID !"),
+    COMMAND_EDIT_TOWER_REMOVE_TOWER$NOT$EXISTS(
+            "%prefix% &cThat tower doesn't exist !"),
 
     COMMAND_EDIT_TOWER_LIST_HEADER(Arrays.asList(
             "&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lTOWERS LIST &3&m--&b&m--&3&m--&b&m--&3&m--",
             " "
     )),
-    COMMAND_EDIT_TOWER_LIST_TOWER("&7&l» &b&l%id% &8&m-&b &3X: &b%X%&7, &3Y: &b%Y%&7, &3Z: &b%Z%&7, &3Material: &b%material%"),
+    COMMAND_EDIT_TOWER_LIST_TOWER("&7&l» &b&l%name% &8&m-&b &3X: &b%X%&7, &3Y: &b%Y%&7, &3Z: &b%Z%&7, &3Material: &b%material%"),
     COMMAND_EDIT_TOWER_LIST_FOOTER(" "),
     COMMAND_EDIT_TOWER_LIST_EMPTY("%prefix% &cThere is no tower created!"),
 
     COMMAND_STOP_SYNTAX("%prefix% &cError syntax, please use: /tst stop <towersync>"),
     COMMAND_STOP_SUCCESS("%prefix% &fThe &b%towersync_name% &ftowersync has been successfully stopped !"),
 
-
-    GAME_ON$TOWER$ALREADY$BROKEN("%prefix% &cYour team has already broken this tower !"),
-    GAME_SYNCHRONIZATION_SUCCESS("%actionbar%&aSuccessful synchronization! Your team has won &e%point% &apoints!"),
-    GAME_SYNCHRONIZATION_PROGRESSION("%actionbar%&eSynchronization in progress... &f(&e%current%&7/&e%goal%&f) &b%time%s remaining"),
-    GAME_SYNCHRONIZATION_FAILED("%actionbar%&cSynchronization failed !"),
-    GAME_NOT$IN$A$TEAM("%prefix% &cYou cannot participate without a team!"),
-
-
-    SCOREBOARD_TOP$EMPTY("&c✘"),
-
-    GENERAL_REWARD$NOT$EXISTS("%prefix% &cThat reward doesn't exist !"),
-
-    GAME_NEXUS_ON$RELOAD("%prefix% &fThe nexus &b%nexus_name% &fwas stopped by force!"),
-    GAME_NEXUS_HEALTH_MESSAGE("%prefix% &fThe nexus is at &b%percent%% &fof its life! Health: &b%runningnexus_health% &4❤"),
-    GAME_COOLDOWN_MESSAGE("%prefix% &fThe nexus &b%nexus_name% &fwill start in &b%minutes% minute(s) and %seconds% second(s) &fat &7(&bX: &f%nexus_location_X%, &bY: &f%nexus_location_Y%, &bZ: &f%nexus_location_Z%&7)"),
-    GAME_ON$NEXUS$STOPPED$BROADCAST("%prefix% &fThe nexus &b%nexus_name% &fhas been stopped!"),
-    GAME_ON$NEXUS$TIMEUP$BROADCAST("%prefix% &fThe nexus %nexus_name% didn't have time to be killed."),
-    GAME_ON$NEXUS$WIN$BROADCAST("%prefix% &b%winner% &fdealt the final blow to the &b%nexus_name% &fnexus."),
-    GAME_ON$NEXUS$START$BROADCAST("%prefix% &fThe &b%nexus_name% &fnexus appeared in &7(&bX: &f%nexus_location_X%, &bY: &f%nexus_location_Y%, &bZ: &f%nexus_location_Z%&7)"),
-    GAME_ON$DAMAGE$NEXUS_FACTION_DOESNT$HAVE$FACTION("%prefix% &cYou have to join a faction to participate !"),
-    GAME_ON$DAMAGE$NEXUS_SKYBLOCK_DOESNT$HAVE$ISLAND("%prefix% &cYou have to join an island to participate !"),
-    GAME_ON$DAMAGE$NEXUS_GANG_DOESNT$HAVE$GANG("%prefix% &cYou have to join a gang to participate !"),
-    GAME_ON$DAMAGE$NEXUS_CLANS_DOESNT$HAVE$GANG("%prefix% &cYou have to join a clan to participate !"),
-
-
     COMMAND_SCHEDULER_HELP$MESSAGE(Arrays.asList(
-            "&3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lNEXUS SCHEDULER &3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--",
+            "&3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lTOWERSYNC SCHEDULER &3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--",
             " ",
-            " &7&l» &f/&bnexus scheduler list",
-            " &7&l» &f/&bnexus scheduler delete <schedulerID>",
-            " &7&l» &f/&bnexus scheduler repeat &3<minute> <nexus> [...]",
-            " &7&l» &f/&bnexus scheduler daily &3<time_of_day> <minute> <nexus> [...]",
-            " &7&l» &f/&bnexus scheduler weekly &3<day_of_week> <time_of_day> <minute> <nexus> [...]",
-            " &7&l» &f/&bnexus scheduler specific &3<month> <day_of_month> <time_of_day> <minute> <nexus> [...]",
+            " &7&l» &f/&btst scheduler list",
+            " &7&l» &f/&btst scheduler delete &3<schedulerID>",
+            " &7&l» &f/&btst scheduler repeat &3<minute> <towersync>",
+            " &7&l» &f/&btst scheduler daily &3<time_of_day> <minute> <towersync>",
+            " &7&l» &f/&btst scheduler weekly &3<day_of_week> <time_of_day> <minute> <towersync>",
+            " &7&l» &f/&btst scheduler specific &3<month> <day_of_month> <time_of_day> <minute> <towersync>",
             " ",
-            "&3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lNEXUS SCHEDULER &3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--"
+            "&3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lTOWERSYNC SCHEDULER &3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--"
     )),
 
     COMMAND_SCHEDULER_LIST_HEADER(Arrays.asList(
             "&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lSCHEDULERS LIST &3&m--&b&m--&3&m--&b&m--&3&m--",
             " "
     )),
-    COMMAND_SCHEDULER_LIST_SCHEDULER(Arrays.asList("&7&l%id%. &3%scheduler_type% &f- &b%nexuses%",
-            "   &7▪ &bMonth: &f%scheduler_month%",
-            "   &7▪ &bDay of month: &f%scheduler_dayOfMonth%",
-            "   &7▪ &bDay of week: &f%scheduler_dayOfWeek%",
-            "   &7▪ &bTime of day: &f%scheduler_timeOfDay%",
-            "   &7▪ &bMinute: &f%scheduler_minutes%",
+    COMMAND_SCHEDULER_LIST_SCHEDULER(Arrays.asList("&7&l%id%. &3%scheduler_type% &f- &b%towersync_name%",
+            "   &8▪ &bMonth: &f%scheduler_month%",
+            "   &8▪ &bDay of month: &f%scheduler_dayOfMonth%",
+            "   &8▪ &bDay of week: &f%scheduler_dayOfWeek%",
+            "   &8▪ &bTime of day: &f%scheduler_timeOfDay%",
+            "   &8▪ &bMinute: &f%scheduler_minutes%",
             " "
     )),
     COMMAND_SCHEDULER_LIST_FOOTER(""),
     COMMAND_SCHEDULER_LIST_EMPTY("%prefix% &cThere is no scheduler created!"),
 
-    COMMAND_SCHEDULER_DELETE_SYNTAX("%prefix% &cError syntax, please use: /nexus scheduler delete <schedulerID>"),
+    COMMAND_SCHEDULER_DELETE_SYNTAX("%prefix% &cError syntax, please use: /tst scheduler delete <schedulerID>"),
     COMMAND_SCHEDULER_DELETE_SUCCESS("%prefix% &fThe scheduler has been successfully deleted!"),
 
-    COMMAND_SCHEDULER_REPEAT_SYNTAX("%prefix% &cError syntax, please use: /nexus scheduler repeat <time_in_minute> <nexus> [...]"),
+    COMMAND_SCHEDULER_REPEAT_SYNTAX("%prefix% &cError syntax, please use: /tst scheduler repeat <time_in_minute> <towersync>"),
     COMMAND_SCHEDULER_REPEAT_SUCCESS("%prefix% &fThe repeated launch has been successfully scheduled!"),
 
-    COMMAND_SCHEDULER_DAILY_SYNTAX("%prefix% &cError syntax, please use: /nexus scheduler daily <time_of_day> <minute> [...]"),
+    COMMAND_SCHEDULER_DAILY_SYNTAX("%prefix% &cError syntax, please use: /tst scheduler daily <time_of_day> <minute> <towersync>"),
     COMMAND_SCHEDULER_DAILY_SUCCESS("%prefix% The daily launch has been successfully scheduled!"),
 
-    COMMAND_SCHEDULER_WEEKLY_SYNTAX("%prefix% &cError syntax, please use: /nexus scheduler weekly <day_of_week> <time_of_day> <minute>  <nexus> [...]"),
+    COMMAND_SCHEDULER_WEEKLY_SYNTAX("%prefix% &cError syntax, please use: /tst scheduler weekly <day_of_week> <time_of_day> <minute> <towersync>"),
     COMMAND_SCHEDULER_WEEKLY_SUCCESS("%prefix% The weekly launch has been successfully scheduled!"),
 
-    COMMAND_SCHEDULER_SPECIFIC_SYNTAX("%prefix% &cError syntax, please use: /nexus scheduler specific <month> <day_of_month> <time_of_day> <minute> <nexus> [...]"),
+    COMMAND_SCHEDULER_SPECIFIC_SYNTAX("%prefix% &cError syntax, please use: /tst scheduler specific <month> <day_of_month> <time_of_day> <minute> <towersync>"),
     COMMAND_SCHEDULER_SPECIFIC_SUCCESS("%prefix% The specific launch has been successfully scheduled!"),
 
+    GAME_ON$TOWER$ALREADY$BROKEN("%prefix% &cYour team has already broken this tower !"),
+    GAME_SYNCHRONIZATION_SUCCESS("%actionbar%&aSuccessful synchronization! Your team has won &e%point% &apoints!"),
+    GAME_SYNCHRONIZATION_PROGRESSION("%actionbar%&eSynchronization in progress... &f(&e%current%&7/&e%goal%&f) &b%time%s remaining"),
+    GAME_SYNCHRONIZATION_FAILED("%actionbar%&cSynchronization failed !"),
+    GAME_NOT$IN$A$TEAM("%prefix% &cYou cannot participate without a team!"),
+    GAME_INCORRECT$ITEM("%prefix% &cYou must use a sword to break the tower!"),
 
+
+    GAME_ON$TOWERSYNC$START$BROADCAST_HEADER("%prefix% &fThe synchronized towers event started with the following towers coordinates:"),
+    GAME_ON$TOWERSYNC$START$BROADCAST_TOWER("   &8▪ &f%tower_name% &7- &3X: &b%tower_location_x%&7, &3Y: &b%tower_location_y%&7, &3Z: &b%tower_location_z%&7"),
+    GAME_COOLDOWN_MESSAGE_HEADER("%prefix% &fThe synchronized towers event &b%towersync_name% &fwill start in &b%minutes% minute(s) and %seconds% second(s) &fwith the following towers coordinates:"),
+    GAME_COOLDOWN_MESSAGE_TOWER("   &8▪ &f%tower_name% &7- &3X: &b%tower_location_x%&7, &3Y: &b%tower_location_y%&7, &3Z: &b%tower_location_z%&7"),
+    GAME_ON$TOWERSYNC$STOPPED$BROADCAST("%prefix% &fThe towersync &b%towersync_name% &fhas been stopped!"),
+    GAME_ON$TOWERSYNC$TIMEUP$BROADCAST("%prefix% &fThe towersync %towersync_name% didn't have time to be won."),
+    GAME_ON$TOWERSYNC$WIN$BROADCAST("%prefix% &b%winner% &fmade the best synchronizations and won the event."),
+
+
+    SCOREBOARD_TOP$EMPTY("&c✘"),
+
+    GENERAL_REWARD$NOT$EXISTS("%prefix% &cThat reward doesn't exist !"),
     COMMAND_REWARD_HELP$MESSAGE(Arrays.asList(
-            "&3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lNEXUS REWARDS &3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--",
+            "&3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lTOWERSYNC REWARDS &3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--",
             " ",
-            " &7&l» &f/&bnexus reward &3<nexus> &blist&f.",
-            " &7&l» &f/&bnexus reward &3<nexus> &badd &3<[Begin]-[End]> <command>&f.",
-            " &7&l» &f/&bnexus reward &3<nexus> &bdelete &3<id>&f.",
+            " &7&l» &f/&btst reward &3<towersync> &blist&f.",
+            " &7&l» &f/&btst reward &3<towersync> &badd &3<Begin-End> <command>&f.",
+            " &7&l» &f/&btst reward &3<towersync> &bdelete &3<id>&f.",
             " ",
-            "&3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lNEXUS PHASE &3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--"
+            "&3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lTOWERSYNC PHASE &3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--"
     )),
 
     COMMAND_REWARD_LIST_HEADER(Arrays.asList(
-            "&3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lNEXUS REWARDS &3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--",
-            "&b%nexus_name% &3nexus rewards",
+            "&3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--&f &b&lTOWERSYNC REWARDS &3&m--&b&m--&3&m--&b&m--&3&m--&b&m--&3&m--",
+            "&b%towersync_name% &3towersync rewards",
             " "
     )),
     COMMAND_REWARD_LIST_REWARD(Arrays.asList(
-            "%nexus_reward_id%.",
-            "    &ePosition interval: &b%nexus_reward_interval_begin% &7to &b%nexus_reward_interval_end%",
+            "%towersync_reward_id%.",
+            "    &ePosition interval: &b%towersync_reward_interval_begin% &7to &b%towersync_reward_interval_end%",
             "    &eCommands: "
     )),
 
-    COMMAND_REWARD_LIST_REWARD$COMMAND("     &f- %nexus_reward_command%"),
+    COMMAND_REWARD_LIST_REWARD$COMMAND("     &f- %towersync_reward_command%"),
 
     COMMAND_REWARD_LIST_FOOTER(
             " "
     ),
 
-    COMMAND_REWARD_ADD_SYNTAX("%prefix% &cError syntax, please use: /nexus reward <nexus> add <[Begin]-[End]> <command>"),
-    COMMAND_REWARD_ADD_SUCCESS("%prefix% &fYou have successfully added a new reward to the nexus &b%nexus_name%&f."),
+    COMMAND_REWARD_ADD_SYNTAX("%prefix% &cError syntax, please use: /tst reward <towersync> add <Begin-End> <command>"),
+    COMMAND_REWARD_ADD_SUCCESS("%prefix% &fYou have successfully added a new reward to the towersync &b%towersync_name%&f."),
 
-    COMMAND_REWARD_DELETE_SYNTAX("%prefix% &cError syntax, please use: /nexus reward <nexus> delete <id>"),
-    COMMAND_REWARD_DELETE_SUCCESS("%prefix% &fYou have successfully deleted the reward to the nexus &b%nexus_name%&f."),
+    COMMAND_REWARD_DELETE_SYNTAX("%prefix% &cError syntax, please use: /tst reward <towersync> delete <id>"),
+    COMMAND_REWARD_DELETE_SUCCESS("%prefix% &fYou have successfully deleted the reward to the towersync &b%towersync_name%&f."),
+
     ;
 
     private List<String> message;
     private final String path;
 
-    private final TheSyncTowers plugin;
 
     Tl(String message) {
         this.message = Collections.singletonList(message);
         this.path = this.name().replace("_", ".").replace("$", "-");
-
-        this.plugin = JavaPlugin.getPlugin(TheSyncTowers.class);
     }
 
     Tl(List<String> listDefaultMessages) {
         this.message = listDefaultMessages;
         this.path = this.name().replace("_", ".").replace("$", "-");
-        this.plugin = JavaPlugin.getPlugin(TheSyncTowers.class);
     }
 
     public void setMessage(List<String> message) {
         this.message = message;
-    }
-
-    public static void init(FileConfiguration fileConfiguration) {
-
     }
 
     public List<String> getMessage() {
@@ -282,7 +299,7 @@ public enum Tl {
         return toReplace.replace("%towersync_name%", towerSync.getName())
                 .replace("%towersync_timeinterval%", towerSync.getTimeInterval() + "")
                 .replace("%towersync_type%", towerSync.getType().name() + "")
-                .replace("%towersync_goal%", towerSync.getValueToWin() + "")
+                .replace("%towersync_goal%", towerSync.getGoal() + "")
                 .replace("%towersync_timebeforeend%", towerSync.getTimeBeforeEnd() + "")
                 .replace("%towersync_towerscount%", towerSync.getTowers().size() + "")
                 ;
@@ -303,6 +320,10 @@ public enum Tl {
     public static String addTowerPlaceholder(Tower tower, String toReplace) {
         return toReplace
                 .replace("%tower_material%", tower.getMaterial().name())
+                .replace("%tower_name%", tower.getName())
+                .replace("%tower_location_x%", tower.getLocation().getBlockX() + "")
+                .replace("%tower_location_y%", tower.getLocation().getBlockY() + "")
+                .replace("%tower_location_z%", tower.getLocation().getBlockZ() + "")
                 ;
     }
 
@@ -334,7 +355,13 @@ public enum Tl {
         return replaced;
     }
 
-/*    public static void sendConfigMessage(CommandSender sender, Tl tl, INexus nexus, IReward reward, String... replace) {
+    public static String addNexusRewardPlaceholder(Reward reward, String toReplace) {
+        return toReplace.replace("%nexus_reward_interval_begin%", reward.getBegin() + "")
+                .replace("%nexus_reward_interval_end%", reward.getEnd() + "")
+                ;
+    }
+
+   public static void sendConfigMessage(CommandSender sender, Tl tl, TowerSync towerSync, Reward reward, String... replace) {
         HashMap<String, String> replaced = new HashMap<>();
         List<String> replaceList = Arrays.asList(replace);
         int index = 0;
@@ -343,8 +370,9 @@ public enum Tl {
             if (index % 2 == 0) continue;
             replaced.put(str, replaceList.get(index));
         }
-        tl.getConfigMessages().forEach(s -> sendConfigMessage(sender, addNexusPlaceholder(nexus, addNexusRewardPlaceholder(reward, s)), replaced));
-    }*/
+        tl.getMessage().forEach(s -> sendConfigMessage(sender, addTowerSyncPlaceholder(towerSync,
+                addNexusRewardPlaceholder(reward, s)), replaced));
+    }
 
     public static void sendConfigMessage(CommandSender sender, Tl tl, TowerSync towerSync, String... replace) {
         HashMap<String, String> replaced = new HashMap<>();
